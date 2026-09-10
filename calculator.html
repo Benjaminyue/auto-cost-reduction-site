@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>零部件供应商降本测算器</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root{
+    --bg:#07090d;
+    --card:#0f141c;
+    --line:#1e2633;
+    --green:#00e676;
+    --red:#ff5252;
+    --blue:#448aff;
+    --purple:#b388ff;
+    --amber:#ffd740;
+    --text:#e6edf3;
+    --muted:#8b949e;
+  }
+  *{box-sizing:border-box}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;
+    margin:0;
+    min-height:100vh;
+    line-height:1.6;
+  }
+  .gradient-text{
+    background:linear-gradient(90deg,#00e676,#448aff);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    background-clip:text;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:24px;
+  }
+  .badge{
+    display:inline-block;
+    padding:2px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:600;
+  }
+  .badge-red{background:rgba(255,82,82,.15);color:var(--red);border:1px solid rgba(255,82,82,.3)}
+  .badge-green{background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3)}
+  .badge-amber{background:rgba(255,215,64,.15);color:var(--amber);border:1px solid rgba(255,215,64,.3)}
+
+  input[type=range]{
+    -webkit-appearance:none;
+    width:100%;
+    height:8px;
+    border-radius:4px;
+    background:var(--line);
+    outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:24px;height:24px;
+    border-radius:50%;
+    background:var(--green);
+    cursor:pointer;
+    box-shadow:0 0 14px rgba(0,230,118,.7);
+    transition:transform .15s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
+  input[type=range]::-moz-range-thumb{
+    width:24px;height:24px;border:none;border-radius:50%;
+    background:var(--green);cursor:pointer;
+  }
+
+  .num-roll{
+    font-variant-numeric:tabular-nums;
+    font-weight:800;
+    transition:color .3s;
+  }
+
+  .pulse-dot{
+    width:8px;height:8px;border-radius:50%;
+    background:var(--red);
+    box-shadow:0 0 10px var(--red);
+    animation:pulse 1.5s infinite;
+    display:inline-block;
+  }
+  @keyframes pulse{
+    0%,100%{opacity:1}
+    50%{opacity:.3}
+  }
+
+  .tag-source{
+    font-size:11px;color:var(--muted);
+    background:rgba(139,148,158,.1);
+    padding:2px 8px;border-radius:4px;
+  }
+
+  .grid-bg{
+    background-image:
+      linear-gradient(rgba(68,138,255,.05) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(68,138,255,.05) 1px,transparent 1px);
+    background-size:40px 40px;
+  }
+
+  .result-card{
+    border-radius:14px;
+    padding:20px;
+    transition:all .3s;
+  }
+
+  .glow-green{animation:glowG 2s infinite}
+  @keyframes glowG{
+    0%,100%{box-shadow:0 0 15px rgba(0,230,118,.2)}
+    50%{box-shadow:0 0 30px rgba(0,230,118,.5)}
+  }
+
+  @media(max-width:640px){
+    .card{padding:16px}
+  }
+</style>
+</head>
+<body class="grid-bg">
+
+<div class="max-w-2xl mx-auto px-4 py-8">
+
+  <!-- Header -->
+  <div class="text-center mb-8">
+    <div class="flex items-center justify-center gap-2 mb-3">
+      <span class="pulse-dot"></span>
+      <span class="badge badge-red">大客户压价30% · 供应链测算</span>
+    </div>
+    <h1 class="text-3xl md:text-4xl font-extrabold mb-2">
+      你的企业还能<span class="gradient-text">撑多久</span>？
+    </h1>
+    <p class="text-gray-400 text-sm">被大客户压价 30%，用 AI 优化能省多少？填 4 个数，实时出结果</p>
+  </div>
+
+  <!-- Input -->
+  <div class="card mb-5">
+    <h2 class="font-bold text-lg mb-5 text-gray-200">📝 输入你的企业参数</h2>
+
+    <div class="space-y-6">
+      <div>
+        <div class="flex justify-between items-center mb-2">
+          <label class="text-sm text-gray-400">供应商依赖度（对最大客户）</label>
+          <span class="num-roll text-2xl text-blue-300" id="depVal">60</span><span class="text-gray-500 text-sm ml-1">%</span>
+        </div>
+        <input type="range" id="dep" min="30" max="100" value="60" step="1">
+        <div class="flex justify-between text-xs text-gray-600 mt-1"><span>30%</span><span>100%</span></div>
+      </div>
+
+      <div>
+        <div class="flex justify-between items-center mb-2">
+          <label class="text-sm text-gray-400">降价压力（被大客户要求降价）</label>
+          <span class="num-roll text-2xl text-red-400" id="cutVal">30</span><span class="text-gray-500 text-sm ml-1">%</span>
+        </div>
+        <input type="range" id="cut" min="5" max="40" value="30" step="1">
+        <div class="flex justify-between text-xs text-gray-600 mt-1"><span>5%</span><span>40%</span></div>
+      </div>
+
+      <div>
+        <div class="flex justify-between items-center mb-2">
+          <label class="text-sm text-gray-400">当前年营收</label>
+          <div class="flex items-center gap-1">
+            <input type="number" id="rev" value="10000" min="100" class="w-28 bg-transparent border-b border-gray-600 text-right text-2xl text-green-300 num-roll focus:outline-none focus:border-green-400">
+            <span class="text-gray-500 text-sm ml-1">万元</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="flex justify-between items-center mb-2">
+          <label class="text-sm text-gray-400">当前利润率</label>
+          <span class="num-roll text-2xl text-amber-300" id="marginVal">5</span><span class="text-gray-500 text-sm ml-1">%</span>
+        </div>
+        <input type="range" id="margin" min="0" max="30" value="5" step="0.5">
+        <div class="flex justify-between text-xs text-gray-600 mt-1"><span>0%</span><span>30%</span></div>
+      </div>
+    </div>
+
+    <!-- Quick cases -->
+    <div class="border-t border-gray-800 mt-6 pt-4">
+      <div class="text-xs text-gray-500 mb-2">⚡ 真实案例一键套用</div>
+      <div class="flex flex-wrap gap-2">
+        <button onclick="applyCase('a')" class="text-xs px-3 py-1.5 rounded-lg bg-amber-900/30 text-amber-300 border border-amber-700/50 hover:bg-amber-900/50 transition">TS Tech 90%依赖</button>
+        <button onclick="applyCase('b')" class="text-xs px-3 py-1.5 rounded-lg bg-amber-900/30 text-amber-300 border border-amber-700/50 hover:bg-amber-900/50 transition">H-One 86%依赖</button>
+        <button onclick="applyCase('c')" class="text-xs px-3 py-1.5 rounded-lg bg-green-900/30 text-green-300 border border-green-700/50 hover:bg-green-900/50 transition">本田 0.3%利润</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="card mb-5">
+    <h2 class="font-bold text-lg mb-5 text-gray-200">📊 实时测算结果</h2>
+
+    <!-- Big number: after cut -->
+    <div class="result-card mb-4" style="background:linear-gradient(135deg,rgba(255,82,82,.1),transparent);border:1px solid rgba(255,82,82,.3)">
+      <div class="text-xs text-red-300 mb-1">被压价后利润率</div>
+      <div class="flex items-baseline gap-2">
+        <span class="num-roll text-5xl" id="afterMargin" style="color:var(--red)">-13.0</span>
+        <span class="text-gray-500 text-lg">%</span>
+      </div>
+      <div class="text-xs text-gray-500 mt-1">= 当前利润率 − 依赖度 × 降价幅度</div>
+    </div>
+
+    <!-- Big number: AI optimized -->
+    <div class="result-card glow-green" style="background:linear-gradient(135deg,rgba(0,230,118,.1),transparent);border:1px solid rgba(0,230,118,.4)">
+      <div class="flex justify-between items-start mb-2">
+        <div class="text-xs text-green-300">AI 优化后利润率</div>
+        <div class="text-right text-xs space-y-0.5">
+          <div class="text-green-300">库存 -32% <span class="tag-source">McKinsey</span></div>
+          <div class="text-green-300">停机 -73% <span class="tag-source">McKinsey</span></div>
+        </div>
+      </div>
+      <div class="flex items-baseline gap-2">
+        <span class="num-roll text-5xl" id="aiMargin" style="color:var(--green)">8.3</span>
+        <span class="text-gray-500 text-lg">%</span>
+      </div>
+      <div class="text-xs text-gray-500 mt-1">准确率 71% → 94%，烂单砍掉，少亏就是赚</div>
+    </div>
+
+    <!-- Savings -->
+    <div class="mt-4 p-4 rounded-xl bg-black/30 border border-gray-800">
+      <div class="flex justify-between items-center mb-3">
+        <span class="text-sm text-gray-400">💰 AI 年节省金额</span>
+        <div class="flex items-baseline gap-1">
+          <span class="num-roll text-3xl text-green-400" id="savings">2,134</span>
+          <span class="text-gray-500 text-sm">万元/年</span>
+        </div>
+      </div>
+      <div class="space-y-1.5 text-sm">
+        <div class="flex justify-between text-gray-400">
+          <span>库存降 32% 节省</span>
+          <span class="text-green-300 num-roll" id="saveInv">800</span>
+        </div>
+        <div class="flex justify-between text-gray-400">
+          <span>停机降 73% 节省</span>
+          <span class="text-green-300 num-roll" id="saveDown">584</span>
+        </div>
+        <div class="flex justify-between text-gray-400">
+          <span>烂单砍掉减亏</span>
+          <span class="text-green-300 num-roll" id="saveBad">750</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comparison chart -->
+    <div class="mt-4 p-4 rounded-xl bg-black/30 border border-gray-800">
+      <div class="text-sm text-gray-300 mb-3 font-semibold">📊 利润率三阶段对比</div>
+      <div class="flex items-end justify-around gap-4 h-32 px-2">
+        <div class="flex flex-col items-center gap-1" style="flex:1">
+          <div class="text-xs text-gray-400" id="bar1Val">5.0%</div>
+          <div class="w-full rounded-t" id="bar1" style="height:50%;background:linear-gradient(180deg,#448aff,#2962ff)"></div>
+          <div class="text-xs text-gray-500">压价前</div>
+        </div>
+        <div class="flex flex-col items-center gap-1" style="flex:1">
+          <div class="text-xs text-gray-400" id="bar2Val">-13.0%</div>
+          <div class="w-full rounded-t" id="bar2" style="height:20%;background:linear-gradient(180deg,#ff5252,#c62828)"></div>
+          <div class="text-xs text-gray-500">被压价后</div>
+        </div>
+        <div class="flex flex-col items-center gap-1" style="flex:1">
+          <div class="text-xs text-green-300" id="bar3Val">8.3%</div>
+          <div class="w-full rounded-t" id="bar3" style="height:70%;background:linear-gradient(180deg,#00e676,#00a152)"></div>
+          <div class="text-xs text-green-400">AI优化后</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROI payback -->
+    <div class="mt-4 p-4 rounded-xl bg-gradient-to-r from-green-950/30 to-emerald-950/30 border border-green-800/40">
+      <div class="flex justify-between items-center">
+        <div>
+          <div class="text-xs text-green-300 mb-1">💰 投入回本周期</div>
+          <div class="text-2xl font-bold text-green-400" id="payback">1.7 个月</div>
+        </div>
+        <div class="text-right text-xs text-gray-400">
+          <div>AI方案投入 ≈ 年节省×30%</div>
+          <div>月节省 × N ≥ 投入</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Advice -->
+    <div class="mt-4 p-4 rounded-xl bg-purple-950/20 border border-purple-800/40">
+      <div class="text-xs text-purple-300 mb-2">💡 建议</div>
+      <div id="advice" class="text-sm text-gray-200 leading-relaxed"></div>
+    </div>
+  </div>
+
+  <!-- Data source note -->
+  <div class="text-center text-xs text-gray-600 px-4">
+    测算基准：麦肯锡报告（AI 装配线准确率 85%+、库存 -32%、停机 -73%、71%→94%）<br>
+    本田案例为公开行业信息。本测算器为自研工具。
+  </div>
+
+  <!-- Links -->
+  <div class="flex items-center justify-center gap-6 text-sm mt-6 pb-6">
+    <a href="index.html" class="text-gray-400 hover:text-white transition">← 返回方案页</a>
+  </div>
+
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+
+  function calc(){
+    const dep = +$('dep').value;
+    const cut = +$('cut').value;
+    const rev = +$('rev').value || 0;
+    const margin = +$('margin').value;
+
+    $('depVal').textContent = dep;
+    $('cutVal').textContent = cut;
+    $('marginVal').textContent = margin;
+
+    // 被压价后利润率
+    const afterMargin = margin - (dep * cut) / 100;
+    $('afterMargin').textContent = afterMargin.toFixed(1);
+    $('afterMargin').style.color = afterMargin < 0 ? 'var(--red)' : afterMargin < 2 ? 'var(--amber)' : 'var(--green)';
+
+    // AI 优化
+    const invCostRatio = 0.25;
+    const downCostRatio = 0.08;
+    const badOrderRatio = 0.075;
+
+    const saveInv = rev * invCostRatio * 0.32;
+    const saveDown = rev * downCostRatio * 0.73;
+    const saveBad = rev * badOrderRatio;
+    const totalSave = saveInv + saveDown + saveBad;
+
+    $('saveInv').textContent = Math.round(saveInv).toLocaleString();
+    $('saveDown').textContent = Math.round(saveDown).toLocaleString();
+    $('saveBad').textContent = Math.round(saveBad).toLocaleString();
+    $('savings').textContent = Math.round(totalSave).toLocaleString();
+
+    const aiMarginPct = totalSave / rev * 100;
+    const aiMargin = afterMargin + aiMarginPct;
+    $('aiMargin').textContent = aiMargin.toFixed(1);
+
+    // 三阶段对比柱状图
+    const maxH = 100;
+    const b1H = Math.max(5, Math.min(100, margin / 30 * maxH));
+    const b2H = Math.max(3, Math.min(100, (afterMargin + 30) / 60 * maxH));
+    const b3H = Math.max(5, Math.min(100, Math.max(0, aiMargin) / 30 * maxH));
+    $('bar1').style.height = b1H + '%';
+    $('bar2').style.height = b2H + '%';
+    $('bar3').style.height = b3H + '%';
+    $('bar1Val').textContent = margin.toFixed(1) + '%';
+    $('bar2Val').textContent = afterMargin.toFixed(1) + '%';
+    $('bar3Val').textContent = aiMargin.toFixed(1) + '%';
+
+    // 回本周期：投入 = 年节省×30%，回本 = 投入 / (年节省/12) = 3.6个月
+    const payback = totalSave > 0 ? (totalSave * 0.3 / (totalSave / 12)).toFixed(1) : '—';
+    $('payback').textContent = payback + ' 个月';
+
+    // 建议
+    let advice = '';
+    if(afterMargin < 0){
+      advice = `⚠️ <strong class="text-red-300">危险</strong>：被压价后利润率 ${afterMargin.toFixed(1)}%，已亏损。必须立即用订单分配优化砍掉亏损订单。`;
+    } else if(afterMargin < 2){
+      advice = `🔴 <strong class="text-red-300">薄利预警</strong>：利润率仅 ${afterMargin.toFixed(1)}%，接近行业危险线。建议尽快上智能排程。`;
+    } else if(afterMargin < 5){
+      advice = `🟡 <strong class="text-amber-300">承压运行</strong>：利润率 ${afterMargin.toFixed(1)}%，抗风险弱。AI优化可提升约 ${aiMarginPct.toFixed(1)} 个百分点。`;
+    } else {
+      advice = `🟢 <strong class="text-green-300">相对健康</strong>：利润率 ${afterMargin.toFixed(1)}%。但依赖度 ${dep}% 仍是隐疾，建议分散订单。`;
+    }
+    advice += `<br><br>📈 AI优化：利润率 <span class="text-red-300">${afterMargin.toFixed(1)}%</span> → <span class="text-green-300">${aiMargin.toFixed(1)}%</span>，年省 <span class="text-green-300">${Math.round(totalSave).toLocaleString()} 万</span>，约 <span class="text-green-300">${payback} 个月</span>回本。`;
+    $('advice').innerHTML = advice;
+  }
+
+  function applyCase(type){
+    if(type==='a'){ $('dep').value=90; $('cut').value=30; $('margin').value=5; }
+    else if(type==='b'){ $('dep').value=86; $('cut').value=30; $('margin').value=4; }
+    else if(type==='c'){ $('dep').value=60; $('cut').value=30; $('margin').value=0.3; }
+    calc();
+  }
+
+  ['dep','cut','margin','rev'].forEach(id=>{
+    $(id).addEventListener('input', calc);
+  });
+
+  calc();
+</script>
+
+</body>
+</html>
