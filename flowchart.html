@@ -1,0 +1,205 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>热点方案三件套 · 制作流程图</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+    background: #0a0f1a;
+    color: #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+  .header { text-align: center; margin-bottom: 40px; }
+  .header h1 { font-size: 28px; font-weight: 700; color: #f1f5f9; margin-bottom: 8px; }
+  .header p { font-size: 14px; color: #64748b; }
+  .legend {
+    display: flex; gap: 12px; margin-bottom: 40px;
+    flex-wrap: wrap; justify-content: center;
+  }
+  .legend-item {
+    padding: 6px 16px; border-radius: 8px;
+    font-size: 12px; font-weight: 600; color: white;
+  }
+  .legend-user { background: linear-gradient(135deg, #1a56DB, #2563EB); }
+  .legend-ai { background: linear-gradient(135deg, #059669, #10B981); }
+  .legend-confirm { background: linear-gradient(135deg, #D97706, #F59E0B); }
+  .legend-output { background: linear-gradient(135deg, #7C3AED, #8B5CF6); }
+  .timeline {
+    display: flex; flex-direction: column; gap: 0;
+    max-width: 900px; width: 100%;
+  }
+  .step {
+    display: flex; align-items: flex-start; gap: 0; position: relative;
+  }
+  .step-num {
+    flex-shrink: 0; width: 56px; height: 56px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 700; color: white; z-index: 2;
+    box-shadow: 0 0 20px rgba(16,185,129,0.3);
+  }
+  .step-num.gradient-ai { background: linear-gradient(135deg, #059669, #10B981); }
+  .step-num.gradient-output { background: linear-gradient(135deg, #7C3AED, #8B5CF6); }
+  .step:not(:last-child) .step-num::after {
+    content: ''; position: absolute; left: 28px; top: 56px;
+    width: 2px; height: calc(100% - 56px + 12px);
+    background: linear-gradient(to bottom, #334155, #1e293b);
+  }
+  .step-content { flex: 1; margin-left: 20px; padding-bottom: 32px; }
+  .step-title { font-size: 18px; font-weight: 700; color: #f1f5f9; margin-bottom: 4px; }
+  .step-desc { font-size: 13px; color: #64748b; margin-bottom: 16px; }
+  .cards-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .card { border-radius: 12px; padding: 14px 18px; min-width: 160px; flex: 1; }
+  .card-user { background: rgba(37,99,235,0.1); border: 1.5px solid rgba(37,99,235,0.4); }
+  .card-ai { background: rgba(16,185,129,0.08); border: 1.5px solid rgba(16,185,129,0.35); }
+  .card-confirm { background: rgba(245,158,11,0.08); border: 1.5px dashed rgba(245,158,11,0.45); }
+  .card-output { background: rgba(139,92,246,0.1); border: 1.5px solid rgba(139,92,246,0.4); }
+  .card-label { font-size: 11px; font-weight: 700; margin-bottom: 6px; }
+  .card-user .card-label { color: #93C5FD; }
+  .card-ai .card-label { color: #6EE7B7; }
+  .card-confirm .card-label { color: #FCD34D; }
+  .card-output .card-label { color: #C4B5FD; }
+  .card-body { font-size: 12px; color: #cbd5e1; line-height: 1.6; }
+  .card-body .tag { color: #fbbf24; font-size: 11px; }
+  .card-body .warn { color: #fca5a5; font-size: 11px; }
+  .arrow { display: flex; align-items: center; color: #475569; font-size: 18px; padding: 0 4px; }
+  .step-half .step-num { background: linear-gradient(135deg, #7C3AED, #8B5CF6); font-size: 14px; }
+  .check-badges { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+  .badge-ok { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.4); border-radius: 6px; padding: 4px 12px; font-size: 11px; font-weight: 600; color: #6EE7B7; text-align: center; }
+  .badge-conflict { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.4); border-radius: 6px; padding: 4px 12px; font-size: 11px; font-weight: 600; color: #FCA5A5; text-align: center; }
+  .badge-risk { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.4); border-radius: 6px; padding: 4px 12px; font-size: 11px; font-weight: 600; color: #FCD34D; text-align: center; }
+  .output-items { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+  .output-item { background: rgba(139,92,246,0.1); border: 1.5px solid rgba(139,92,246,0.35); border-radius: 8px; padding: 8px 16px; font-size: 12px; font-weight: 600; color: #DDD6FE; text-align: center; }
+  .bottom-note { margin-top: 20px; text-align: center; font-size: 13px; color: #475569; max-width: 860px; }
+  @media (max-width: 768px) {
+    .cards-row { flex-direction: column; }
+    .arrow { transform: rotate(90deg); justify-content: center; }
+  }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>热点方案三件套 · 制作流程图</h1>
+  <p>用户给选题 -&gt; AI分步执行 -&gt; 每步确认 -&gt; 定版保存</p>
+</div>
+<div class="legend">
+  <div class="legend-item legend-user">用户操作</div>
+  <div class="legend-item legend-ai">AI执行</div>
+  <div class="legend-item legend-confirm">确认节点</div>
+  <div class="legend-item legend-output">产出物</div>
+</div>
+<div class="timeline">
+  <div class="step">
+    <div class="step-num gradient-ai">1</div>
+    <div class="step-content">
+      <div class="step-title">选题拆解</div>
+      <div class="step-desc">用户给热点/痛点 -&gt; AI拆解切入角度</div>
+      <div class="cards-row">
+        <div class="card card-user"><div class="card-label">用户输入</div><div class="card-body">行业热点 / 痛点 / 事件<br>例如：大客户压价30%</div></div>
+        <div class="arrow">→</div>
+        <div class="card card-ai"><div class="card-label">AI拆解</div><div class="card-body">压力源 · 承压方 · 损失量化<br>输出 2-3 个切入角度</div></div>
+        <div class="arrow">→</div>
+        <div class="card card-confirm"><div class="card-label">等用户选角度</div><div class="card-body">成本侧 / 风险侧 / 增长侧<br>选一个方向继续</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num gradient-ai">2</div>
+    <div class="step-content">
+      <div class="step-title">资料搜索</div>
+      <div class="step-desc">AI自己搜英文文章+GitHub开源项目，不固定来源</div>
+      <div class="cards-row">
+        <div class="card card-ai"><div class="card-label">搜英文文章 ×2</div><div class="card-body">McKinsey / Deloitte / Gartner<br>提取：准确率 · 降幅 · ROI<br><span class="tag">必须真实数字，不编造</span></div></div>
+        <div class="arrow">→</div>
+        <div class="card card-ai"><div class="card-label">搜GitHub项目 ×2</div><div class="card-body">site:github.com + 领域关键词<br>提取：架构 · 技术栈 · 模块<br><span class="tag">star 10+，有README优先</span></div></div>
+        <div class="arrow">→</div>
+        <div class="card card-confirm"><div class="card-label">等用户确认</div><div class="card-body">"用这些" / 替换 / 补充</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num gradient-ai">3</div>
+    <div class="step-content">
+      <div class="step-title">内容创作</div>
+      <div class="step-desc">逻辑链 + 五段分镜 + 测算器逻辑设计</div>
+      <div class="cards-row">
+        <div class="card card-ai"><div class="card-label">逻辑链</div><div class="card-body">热点 -&gt; 痛点 -&gt; AI能做什么<br>-&gt; 量化收益 -&gt; 落地效果<br><span class="tag">业务优先，技术后置</span></div></div>
+        <div class="arrow">→</div>
+        <div class="card card-ai"><div class="card-label">五段分镜</div><div class="card-body">①钩子 -&gt; ②拆解 -&gt; ③方案<br>-&gt; ④数据 -&gt; ⑤CTA<br><span class="tag">口语化，每段有数字</span></div></div>
+        <div class="arrow">→</div>
+        <div class="card card-ai"><div class="card-label">测算器逻辑</div><div class="card-body">输入参数 + 公式设计<br>输出 + 对比维度<br><span class="tag">公式透明可追溯</span></div></div>
+        <div class="arrow">→</div>
+        <div class="card card-confirm"><div class="card-label">来回迭代</div><div class="card-body">改到满意为止<br>不限轮次</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num gradient-ai">4</div>
+    <div class="step-content">
+      <div class="step-title">页面搭建</div>
+      <div class="step-desc">方案页（6区块）+ 测算器，暗色科技风</div>
+      <div class="cards-row">
+        <div class="card card-ai"><div class="card-label">方案页（6区块）</div><div class="card-body">① HERO 痛点+数字<br>② 逻辑链 ③ BI驾驶舱<br>④ 效果 ⑤ 数据来源 ⑥ CTA<br><span class="warn">不放GitHub 不写公司名</span></div></div>
+        <div class="arrow">→</div>
+        <div class="card card-ai"><div class="card-label">测算器</div><div class="card-body">滑块输入（3-5个参数）<br>三阶段对比柱状图<br>回本周期 + 智能建议<br><span class="tag">案例按钮匿名化</span></div></div>
+        <div class="arrow">→</div>
+        <div class="card card-confirm"><div class="card-label">看效果迭代</div><div class="card-body">配色 / 布局 / 数据<br>截图对比确认</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="step step-half">
+    <div class="step-num gradient-output">4.5</div>
+    <div class="step-content">
+      <div class="step-title">视频一致性校验</div>
+      <div class="step-desc">用户上传视频/口播稿 -&gt; AI逐条匹配方案页</div>
+      <div class="cards-row">
+        <div class="card card-user"><div class="card-label">上传视频/口播稿</div><div class="card-body">口播稿不改<br>方案页对齐口播稿</div></div>
+        <div class="arrow">→</div>
+        <div class="card card-ai"><div class="card-label">AI逐条匹配</div><div class="card-body">企业名 / 数字 / 业务描述<br>三个维度逐条比对</div></div>
+        <div class="arrow">→</div>
+        <div class="card card-ai" style="min-width:140px;flex:0.8;">
+          <div class="card-label">输出三张表</div>
+          <div class="check-badges">
+            <div class="badge-ok">已对齐</div>
+            <div class="badge-conflict">冲突点</div>
+            <div class="badge-risk">风险点</div>
+          </div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="card card-confirm"><div class="card-label">确认修改方向</div><div class="card-body">方案页反向<br>对齐口播稿</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num gradient-output">5</div>
+    <div class="step-content">
+      <div class="step-title">定版保存</div>
+      <div class="step-desc">用户说"定了"才执行，不说不动</div>
+      <div class="cards-row">
+        <div class="card card-user"><div class="card-label">用户说"定了"</div><div class="card-body">触发保存流程<br>之前所有修改都是草稿</div></div>
+        <div class="arrow">→</div>
+        <div class="card card-output"><div class="card-label">三步保存</div>
+          <div class="output-items">
+            <div class="output-item">部署 GitHub</div>
+            <div class="output-item">验证线上可访问</div>
+            <div class="output-item">存 Obsidian 文档</div>
+          </div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="card card-output" style="flex:1.5;">
+          <div class="card-label">最终交付</div>
+          <div class="card-body">方案页 + 测算器（线上可访问）<br>资源链接文档（存Obsidian）<br>5段分镜 + 逻辑链</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="bottom-note">每个橙色虚线框 = 停下来等用户确认 · 不说"定了"不保存</div>
+</body>
+</html>
