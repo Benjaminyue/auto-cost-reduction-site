@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>人力规划AI方案 | 从星宇劝退事件看产能预判</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0f1a;color:#e2e8f0;font-family:'Segoe UI','Microsoft YaHei',sans-serif;line-height:1.6}
+.container{max-width:1200px;margin:0 auto;padding:0 20px}
+
+.hero{background:linear-gradient(135deg,#0a0f1a 0%,#0f172a 50%,#1e293b 100%);padding:80px 0 60px;border-bottom:1px solid #1e293b}
+.hero h1{font-size:42px;font-weight:800;line-height:1.2;margin-bottom:16px}
+.hero h1 .highlight{background:linear-gradient(90deg,#3b82f6,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero .subtitle{font-size:18px;color:#94a3b8;margin-bottom:32px;max-width:760px}
+.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:40px}
+.stat-card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;text-align:center}
+.stat-card .num{font-size:32px;font-weight:800;color:#f87171}
+.stat-card .label{font-size:13px;color:#94a3b8;margin-top:4px}
+.stat-card.green .num{color:#34d399}
+.stat-card.orange .num{color:#fbbf24}
+.stat-card.blue .num{color:#60a5fa}
+
+section{padding:60px 0}
+.section-title{font-size:28px;font-weight:700;margin-bottom:8px}
+.section-desc{color:#94a3b8;margin-bottom:36px;font-size:15px}
+
+.case-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.case-card{background:#1e293b;border:1px solid #334155;border-radius:14px;padding:28px}
+.case-card h3{font-size:18px;color:#60a5fa;margin-bottom:16px}
+.case-card .big-num{font-size:48px;font-weight:800;color:#f87171;line-height:1}
+.case-card .big-num.green{color:#34d399}
+.case-card .explain{color:#94a3b8;font-size:14px;margin-top:10px}
+.case-card ul{list-style:none;margin-top:14px}
+.case-card ul li{padding:6px 0;color:#cbd5e1;font-size:14px;border-bottom:1px solid #334155}
+.case-card ul li:last-child{border-bottom:none}
+.case-card ul li b{color:#fbbf24}
+
+.pain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.pain-card{background:#1e293b;border:1px solid #334155;border-radius:14px;padding:26px;border-left:4px solid #f87171}
+.pain-card .icon{font-size:32px;margin-bottom:12px}
+.pain-card h3{font-size:17px;margin-bottom:10px;color:#f1f5f9}
+.pain-card p{color:#94a3b8;font-size:14px}
+
+.ai-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.ai-card{background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%);border:1px solid #3b82f6;border-radius:14px;padding:28px;position:relative;overflow:hidden}
+.ai-card::before{content:'';position:absolute;top:0;right:0;width:120px;height:120px;background:#3b82f6;opacity:0.08;border-radius:0 0 0 100%}
+.ai-card .step{font-size:13px;color:#60a5fa;font-weight:700;margin-bottom:8px}
+.ai-card h3{font-size:19px;margin-bottom:12px;color:#f1f5f9}
+.ai-card .biz{color:#cbd5e1;font-size:14px;margin-bottom:14px}
+.ai-card .tech{font-size:12px;color:#64748b;background:#0f172a;padding:10px 12px;border-radius:8px;border-left:3px solid #334155}
+.ai-card .effect{margin-top:14px;padding-top:14px;border-top:1px solid #334155}
+.ai-card .effect .val{font-size:24px;font-weight:800;color:#34d399}
+.ai-card .effect .lbl{font-size:12px;color:#94a3b8}
+
+.effect-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.effect-item{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:24px;text-align:center}
+.effect-item .val{font-size:36px;font-weight:800;color:#34d399}
+.effect-item .val.red{color:#f87171}
+.effect-item .val.orange{color:#fbbf24}
+.effect-item .val.blue{color:#60a5fa}
+.effect-item .lbl{font-size:13px;color:#94a3b8;margin-top:6px}
+.effect-item .src{font-size:11px;color:#64748b;margin-top:8px}
+
+.gh-card{background:#1e293b;border:1px solid #334155;border-radius:14px;padding:28px;margin-bottom:20px}
+.gh-card .row{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:16px}
+.gh-card h3{font-size:20px;color:#f1f5f9}
+.gh-card .stars{color:#fbbf24;font-size:14px}
+.gh-card .desc{color:#94a3b8;font-size:14px;margin-bottom:16px}
+.gh-card .pipeline{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.gh-card .pipe-step{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:10px 14px;font-size:13px;color:#cbd5e1}
+.gh-card .pipe-arrow{color:#64748b}
+.gh-card .tag{display:inline-block;background:#3b82f6;color:white;font-size:11px;padding:3px 10px;border-radius:20px;margin-right:6px;margin-top:16px}
+
+.src-table{width:100%;border-collapse:collapse}
+.src-table th,.src-table td{padding:12px 16px;text-align:left;border-bottom:1px solid #334155;font-size:14px}
+.src-table th{color:#60a5fa;font-weight:600}
+.src-table td{color:#cbd5e1}
+.src-table tr:hover{background:#1e293b}
+
+.cta{background:linear-gradient(135deg,#1e3a8a 0%,#1e40af 100%);border-radius:16px;padding:50px 40px;text-align:center;margin:40px 0}
+.cta h2{font-size:28px;margin-bottom:12px}
+.cta p{color:#bfdbfe;margin-bottom:28px;font-size:16px}
+.btn{display:inline-block;background:#3b82f6;color:white;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:600;font-size:16px;transition:transform .2s}
+.btn:hover{transform:translateY(-2px)}
+.cta .note{margin-top:20px;color:#93c5fd;font-size:13px}
+
+footer{border-top:1px solid #1e293b;padding:30px 0;color:#64748b;font-size:13px;text-align:center}
+
+@media(max-width:768px){
+  .hero h1{font-size:28px}
+  .hero-stats,.pain-grid,.ai-grid,.effect-grid,.case-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="container">
+    <h1>招了440人，裁了107人<br><span class="highlight">人力规划靠拍脑袋，代价是70倍</span></h1>
+    <p class="subtitle">国内车灯龙头2025年秋招440名硕博，入职一个月集中劝退107人。为省约2000万人力成本，市值蒸发14.74亿。这不是个例，是制造业产能预判与人力规划错配的缩影。</p>
+    <div class="hero-stats">
+      <div class="stat-card"><div class="num">440</div><div class="label">2025秋招硕博数</div></div>
+      <div class="stat-card"><div class="num">107</div><div class="label">集中劝退人数</div></div>
+      <div class="stat-card orange"><div class="num">24%</div><div class="label">劝退占比</div></div>
+      <div class="stat-card green"><div class="num">14.74亿</div><div class="label">市值蒸发</div></div>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="container">
+    <h2 class="section-title">招了又裁，真实代价有多大？</h2>
+    <p class="section-desc">表面上是"优化人力结构"，账算下来是70倍杠杆的亏损。</p>
+    <div class="case-grid">
+      <div class="case-card">
+        <h3>裁员的账面成本 vs 真实代价</h3>
+        <div class="big-num">70×</div>
+        <div class="explain">为省约 <b style="color:#fbbf24">2000万</b> 人力成本，市值蒸发 <b style="color:#f87171">14.74亿</b></div>
+        <ul>
+          <li>辞退福利仅 <b>186.7万</b>（人均645元）</li>
+          <li>董事长持股42%，账面缩水 <b>6.2亿</b></li>
+          <li>一周股价跌 <b>6.33%</b></li>
+          <li>大众、奔驰启动供应链合规调查</li>
+        </ul>
+      </div>
+      <div class="case-card">
+        <h3>正式工 vs 外包：成本差3倍</h3>
+        <div class="big-num green">3×</div>
+        <div class="explain">外包时薪约 <b style="color:#34d399">27.8元</b>，正式员工人均成本 <b style="color:#34d399">17.4万/年</b></div>
+        <ul>
+          <li>正式员工：2024年 <b>10426人</b> → 2025年 <b>7532人</b>（-27.8%）</li>
+          <li>生产人员砍 <b>40%</b>，技术人员反而增长</li>
+          <li>劳务外包报酬：2.44亿 → 3.02亿（<b>+24%</b>）</li>
+          <li>比例失衡：该用外包的地方用正式工，该留正式工的地方裁掉</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="background:#0f172a">
+  <div class="container">
+    <h2 class="section-title">三个核心痛点</h2>
+    <p class="section-desc">HR 靠拍脑袋招人，订单一波动就裁员，招的人还留不住。</p>
+    <div class="pain-grid">
+      <div class="pain-card">
+        <div class="icon">🎯</div>
+        <h3>招人靠拍脑袋</h3>
+        <p>没有人力需求预测模型，订单好就猛招，订单差就猛裁。招聘+培训成本打水漂，还砸了雇主品牌。</p>
+      </div>
+      <div class="pain-card">
+        <div class="icon">💸</div>
+        <h3>正式外包比例失衡</h3>
+        <p>外包成本是正式工的1/3，但比例靠感觉调。订单波动时，正式工养不起，外包又补不上。</p>
+      </div>
+      <div class="pain-card">
+        <div class="icon">🚪</div>
+        <h3>招的人留不住</h3>
+        <p>加班多、满意度低、收入不匹配的员工悄悄在找下家，等发现人走了才紧急招人，陷入恶性循环。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2 class="section-title">AI 能做什么</h2>
+    <p class="section-desc">不是替代HR，是让数据替你拍板。</p>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="step">能力 ①</div>
+        <h3>人力需求预测</h3>
+        <p class="biz">根据订单量、产能、历史数据，算出每个季度该招多少人、裁多少人、外包多少。不再拍脑袋。</p>
+        <div class="tech">技术：Erlang C 排队模型 + OR-Tools CP-SAT 约束求解（参考 pyworkforce）。例：100单/30分钟、平均处理3分钟，算出需20人（含损耗）</div>
+        <div class="effect"><span class="val">预测误差↓</span><span class="lbl">从拍脑袋到数据驱动</span></div>
+      </div>
+      <div class="ai-card">
+        <div class="step">能力 ②</div>
+        <h3>智能排班 + 外包配比</h3>
+        <p class="biz">自动算每班需要多少人、谁上什么班、正式工和外包各占多少比例最划算。订单波动自动调整。</p>
+        <div class="tech">技术：OR-Tools CP-SAT 约束求解（多技能排班+轮班+休息时间，scikit-learn 风格 API，solve() 一键出结果）</div>
+        <div class="effect"><span class="val">人力成本↓</span><span class="lbl">正式外包比例最优</span></div>
+      </div>
+      <div class="ai-card">
+        <div class="step">能力 ③</div>
+        <h3>员工流失预警</h3>
+        <p class="biz">提前识别哪些员工有离职风险（加班多、满意度低、收入不匹配），主动留人，避免招了又走。</p>
+        <div class="tech">技术：XGBoost + SHAP 可解释性（IBM HR 数据集，准确率92%，ROC-AUC 0.971）。关键因素：加班、月收入、工作满意度、岗位</div>
+        <div class="effect"><span class="val">离职率↓</span><span class="lbl">招聘浪费减少</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="background:#0f172a">
+  <div class="container">
+    <h2 class="section-title">落地效果（行业验证）</h2>
+    <p class="section-desc">数据来自 Deloitte、KPMG 行业报告。</p>
+    <div class="effect-grid">
+      <div class="effect-item"><div class="val orange">82%</div><div class="lbl">企业认为释放人力产能重要</div><div class="src">Deloitte 2026</div></div>
+      <div class="effect-item"><div class="val red">8%</div><div class="lbl">仅取得大进展</div><div class="src">Deloitte 2026</div></div>
+      <div class="effect-item"><div class="val">10%</div><div class="lbl">AI人力规划省年人工预算</div><div class="src">KPMG 估算</div></div>
+      <div class="effect-item"><div class="val blue">8-12周</div><div class="lbl">试点见效周期</div><div class="src">Deloitte 2026</div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2 class="section-title">能力拆解（已落地可验证）</h2>
+    <p class="section-desc">以下为开源项目架构参考，用于说明AI能力如何落地。</p>
+    <div class="gh-card">
+      <div class="row"><h3>pyworkforce · 完整人力管理规划管线</h3><span class="stars">⭐ 86</span></div>
+      <p class="desc">scikit-learn 风格 API（solve() 一键出结果），从需求预测到排班输出一条龙。适用呼叫中心、医疗、零售、物流、制造业、服务台、现场作业。</p>
+      <div class="pipeline">
+        <span class="pipe-step">forecast<br><small>需求预测</small></span>
+        <span class="pipe-arrow">→</span>
+        <span class="pipe-step">queuing<br><small>Erlang C/A/B 算需要多少人</small></span>
+        <span class="pipe-arrow">→</span>
+        <span class="pipe-step">staffing<br><small>多技能最优组合</small></span>
+        <span class="pipe-arrow">→</span>
+        <span class="pipe-step">scheduling<br><small>每班多少人</small></span>
+        <span class="pipe-arrow">→</span>
+        <span class="pipe-step">rostering<br><small>谁哪天哪个班</small></span>
+        <span class="pipe-arrow">→</span>
+        <span class="pipe-step">breaks<br><small>休息时间安排</small></span>
+      </div>
+      <div style="margin-top:16px;background:#0f172a;border-radius:8px;padding:14px;font-size:13px;color:#cbd5e1">
+        <b style="color:#60a5fa">Erlang C 算例（真实代码输出）：</b><br>
+        输入：100单/30分钟、平均处理3分钟、目标接听20秒、损耗率30%<br>
+        输出：raw_positions=14（纯产能）→ positions=<b style="color:#34d399">20</b>（含休息/培训损耗）、服务水平 88.8%、上座率 71.4%
+      </div>
+      <div><span class="tag">Erlang C/A/B</span><span class="tag">OR-Tools CP-SAT</span><span class="tag">约束编程</span><span class="tag">Python 3.12+</span><span class="tag">MIT License</span></div>
+    </div>
+    <div class="gh-card">
+      <div class="row"><h3>Employee Attrition Prediction · 员工流失预测</h3></div>
+      <p class="desc">基于 IBM HR Analytics 数据集，用 XGBoost + SHAP 预测哪些员工会离职，并解释为什么。比 Random Forest 更准，且能告诉你每个员工离职的关键原因。</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0">
+        <div style="background:#0f172a;border-radius:8px;padding:12px">
+          <div style="font-size:12px;color:#94a3b8">Random Forest</div>
+          <div style="font-size:20px;font-weight:800;color:#60a5fa">90%</div>
+          <div style="font-size:11px;color:#64748b">准确率 · ROC-AUC 0.90</div>
+        </div>
+        <div style="background:#0f172a;border-radius:8px;padding:12px;border:1px solid #34d399">
+          <div style="font-size:12px;color:#34d399">XGBoost + SHAP ✅</div>
+          <div style="font-size:20px;font-weight:800;color:#34d399">92%</div>
+          <div style="font-size:11px;color:#64748b">准确率 · ROC-AUC 0.971</div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:#cbd5e1;background:#0f172a;border-radius:8px;padding:12px">
+        <b style="color:#60a5fa">SHAP 关键影响因素（按重要性排序）：</b><br>
+        加班(OverTime) → 月收入(MonthlyIncome) → 工作满意度(JobSatisfaction) → 岗位(JobRole)
+      </div>
+      <div><span class="tag">XGBoost</span><span class="tag">Random Forest</span><span class="tag">SHAP 可解释性</span><span class="tag">SMOTE 不平衡处理</span><span class="tag">IBM HR 数据集</span></div>
+    </div>
+  </div>
+</section>
+
+<section style="background:#0f172a">
+  <div class="container">
+    <h2 class="section-title">数据来源</h2>
+    <p class="section-desc">所有数据均可追溯。</p>
+    <table class="src-table">
+      <thead><tr><th>数据</th><th>来源</th></tr></thead>
+      <tbody>
+        <tr><td>星宇劝退107人、市值蒸发14.74亿</td><td>企业公告、常州市人社局通报</td></tr>
+        <tr><td>2025年营收152.57亿、净利16.24亿</td><td>企业2025年报</td></tr>
+        <tr><td>正式员工10426→7532人</td><td>企业年报</td></tr>
+        <tr><td>外包报酬2.44亿→3.02亿</td><td>企业年报</td></tr>
+        <tr><td>82%认为重要、8%有进展</td><td>Deloitte《AI战略指南：劳动力规划》2026</td></tr>
+        <tr><td>AI省10%年人工预算</td><td>KPMG 估算</td></tr>
+        <tr><td>8-12周试点周期</td><td>Deloitte《2026人力规划与分析终极指南》</td></tr>
+        <tr><td>人力规划管线（Erlang C + OR-Tools）</td><td>开源项目 pyworkforce（MIT License）</td></tr>
+        <tr><td>流失预测（XGBoost 92%、ROC-AUC 0.971）</td><td>开源项目 Employee Attrition Prediction + IBM HR 数据集</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="cta">
+      <h2>算一算你的人力成本还能省多少</h2>
+      <p>填 5 个数，1 分钟算出超员成本、缺员损失、招聘浪费，以及 AI 优化后能省多少。</p>
+      <a href="calculator.html" class="btn">🧮 打开人力规划测算器</a>
+      <div class="note">评论区留你的行业，测算器链接发你 · 看看还能撑多久</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">数据来源：企业公开年报、Deloitte、KPMG 行业报告 · 本页为行业方案展示</div>
+</footer>
+
+</body>
+</html>

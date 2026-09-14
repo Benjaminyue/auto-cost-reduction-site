@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>人力规划测算器 | AI优化人力成本</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0f1a;color:#e2e8f0;font-family:'Segoe UI','Microsoft YaHei',sans-serif;line-height:1.6;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:30px 20px}
+.header{text-align:center;margin-bottom:30px}
+.header h1{font-size:32px;font-weight:800;margin-bottom:8px}
+.header p{color:#94a3b8;font-size:15px}
+.back-link{color:#60a5fa;text-decoration:none;font-size:14px;display:inline-block;margin-bottom:16px}
+.back-link:hover{text-decoration:underline}
+
+.layout{display:grid;grid-template-columns:1fr 1.2fr;gap:24px}
+
+.input-panel,.output-panel{background:#1e293b;border:1px solid #334155;border-radius:14px;padding:24px}
+.panel-title{font-size:18px;font-weight:700;margin-bottom:20px;color:#f1f5f9}
+
+.slider-group{margin-bottom:22px}
+.slider-group label{display:flex;justify-content:space-between;font-size:14px;color:#cbd5e1;margin-bottom:8px}
+.slider-group label .val{color:#60a5fa;font-weight:700}
+.slider-group input[type=range]{width:100%;height:6px;-webkit-appearance:none;background:#334155;border-radius:3px;outline:none}
+.slider-group input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#3b82f6;cursor:pointer;border:2px solid #60a5fa}
+.slider-group .hint{font-size:12px;color:#64748b;margin-top:6px}
+
+.case-btns{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap}
+.case-btn{background:#0f172a;border:1px solid #334155;color:#cbd5e1;padding:8px 16px;border-radius:8px;font-size:13px;cursor:pointer;transition:all .2s}
+.case-btn:hover{border-color:#3b82f6;color:#60a5fa}
+
+.output-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.out-card{background:#0f172a;border:1px solid #334155;border-radius:10px;padding:16px}
+.out-card .lbl{font-size:12px;color:#94a3b8;margin-bottom:6px}
+.out-card .val{font-size:22px;font-weight:800}
+.out-card .val.red{color:#f87171}
+.out-card .val.green{color:#34d399}
+.out-card .val.orange{color:#fbbf24}
+.out-card .val.blue{color:#60a5fa}
+.out-card .unit{font-size:13px;color:#64748b;font-weight:400;margin-left:4px}
+
+.full{grid-column:1/-1}
+
+.advice{background:#0f172a;border-left:4px solid #fbbf24;border-radius:8px;padding:16px;margin-bottom:20px}
+.advice.high{border-left-color:#f87171}
+.advice.low{border-left-color:#34d399}
+.advice .level{font-weight:700;margin-bottom:6px}
+.advice.high .level{color:#f87171}
+.advice.mid .level{color:#fbbf24}
+.advice.low .level{color:#34d399}
+.advice p{font-size:13px;color:#cbd5e1}
+
+.chart-section{margin-top:20px}
+.chart-title{font-size:15px;font-weight:700;margin-bottom:14px;color:#f1f5f9}
+.chart{display:flex;align-items:flex-end;justify-content:space-around;height:200px;background:#0f172a;border-radius:10px;padding:20px;border:1px solid #334155}
+.bar-wrap{display:flex;flex-direction:column;align-items:center;width:28%}
+.bar{width:100%;border-radius:6px 6px 0 0;transition:height .5s;min-height:4px}
+.bar-label{font-size:11px;color:#94a3b8;margin-top:8px;text-align:center}
+.bar-val{font-size:13px;font-weight:700;margin-bottom:6px}
+
+footer{text-align:center;color:#64748b;font-size:12px;margin-top:30px;padding:20px 0;border-top:1px solid #1e293b}
+footer a{color:#60a5fa;text-decoration:none}
+
+@media(max-width:768px){.layout{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+  <a href="index.html" class="back-link">← 返回方案页</a>
+  <div class="header">
+    <h1>🧮 人力规划测算器</h1>
+    <p>填5个数，1分钟算出你的人力成本还能省多少</p>
+  </div>
+
+  <div class="case-btns">
+    <button class="case-btn" onclick="loadCase('xingyu')">星宇案例（7532人）</button>
+    <button class="case-btn" onclick="loadCase('mid')">中型制造（2000人）</button>
+    <button class="case-btn" onclick="loadCase('small')">小型企业（500人）</button>
+  </div>
+
+  <div class="layout">
+    <div class="input-panel">
+      <div class="panel-title">📊 输入参数</div>
+
+      <div class="slider-group">
+        <label>当前员工总数 <span class="val"><span id="v_emp">7532</span> 人</span></label>
+        <input type="range" id="emp" min="50" max="20000" value="7532" step="50">
+        <div class="hint">企业现有正式员工数量</div>
+      </div>
+
+      <div class="slider-group">
+        <label>订单波动幅度 <span class="val"><span id="v_fluc">-20</span>%</span></label>
+        <input type="range" id="fluc" min="-50" max="50" value="-20" step="5">
+        <div class="hint">季度订单量变化（负=下滑，正=上涨）</div>
+      </div>
+
+      <div class="slider-group">
+        <label>正式员工年人均成本 <span class="val"><span id="v_cost">17.4</span> 万/人/年</span></label>
+        <input type="range" id="cost" min="5" max="50" value="17.4" step="0.5">
+        <div class="hint">含工资+社保+福利+公积金</div>
+      </div>
+
+      <div class="slider-group">
+        <label>外包工时成本 <span class="val"><span id="v_out">27.8</span> 元/小时</span></label>
+        <input type="range" id="out" min="10" max="80" value="27.8" step="0.5">
+        <div class="hint">外包人员小时成本</div>
+      </div>
+
+      <div class="slider-group">
+        <label>当前离职率 <span class="val"><span id="v_attr">15</span>%</span></label>
+        <input type="range" id="attr" min="0" max="50" value="15" step="1">
+        <div class="hint">年度自愿离职率</div>
+      </div>
+    </div>
+
+    <div class="output-panel">
+      <div class="panel-title">💡 测算结果</div>
+
+      <div class="output-grid">
+        <div class="out-card">
+          <div class="lbl">超员成本（订单下滑时多养的人）</div>
+          <div class="val red"><span id="o_over">0</span><span class="unit">万元/年</span></div>
+        </div>
+        <div class="out-card">
+          <div class="lbl">缺员损失（订单上涨时产能不足）</div>
+          <div class="val orange"><span id="o_short">0</span><span class="unit">万元/年</span></div>
+        </div>
+        <div class="out-card">
+          <div class="lbl">招聘成本浪费（招了又走）</div>
+          <div class="val orange"><span id="o_waste">0</span><span class="unit">万元/年</span></div>
+        </div>
+        <div class="out-card">
+          <div class="lbl">AI优化后年节省</div>
+          <div class="val green"><span id="o_save">0</span><span class="unit">万元/年</span></div>
+        </div>
+        <div class="out-card">
+          <div class="lbl">流失风险员工数</div>
+          <div class="val blue"><span id="o_risk">0</span><span class="unit">人</span></div>
+        </div>
+        <div class="out-card">
+          <div class="lbl">回本周期</div>
+          <div class="val green"><span id="o_roi">0</span><span class="unit">个月</span></div>
+        </div>
+      </div>
+
+      <div id="advice" class="advice">
+        <div class="level">⚡ 风险评估</div>
+        <p id="adviceText">移动滑块查看结果</p>
+      </div>
+
+      <div class="chart-section">
+        <div class="chart-title">📈 三阶段人力成本对比</div>
+        <div class="chart">
+          <div class="bar-wrap">
+            <div class="bar-val" id="cv1" style="color:#60a5fa">0</div>
+            <div class="bar" id="b1" style="height:10%;background:#3b82f6"></div>
+            <div class="bar-label">现状<br>（年人力成本）</div>
+          </div>
+          <div class="bar-wrap">
+            <div class="bar-val" id="cv2" style="color:#f87171">0</div>
+            <div class="bar" id="b2" style="height:10%;background:#ef4444"></div>
+            <div class="bar-label">订单波动后<br>（含超员/缺员损失）</div>
+          </div>
+          <div class="bar-wrap">
+            <div class="bar-val" id="cv3" style="color:#34d399">0</div>
+            <div class="bar" id="b3" style="height:10%;background:#10b981"></div>
+            <div class="bar-label">AI优化后<br>（省10%+规避损失）</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    数据来源：Deloitte 2026、KPMG 估算 · AI节省按年人工预算10%计算 · 招聘成本按人均3个月工资估算<br>
+    <a href="index.html">← 返回方案页</a>
+  </footer>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const inputs = ['emp','fluc','cost','out','attr'];
+inputs.forEach(id => $(id).addEventListener('input', calc));
+
+function calc(){
+  const emp = +$('emp').value;
+  const fluc = +$('fluc').value;
+  const cost = +$('cost').value;       // 万/人/年
+  const outRate = +$('out').value;     // 元/小时
+  const attr = +$('attr').value;       // %
+
+  $('v_emp').textContent = emp;
+  $('v_fluc').textContent = fluc;
+  $('v_cost').textContent = cost;
+  $('v_out').textContent = outRate;
+  $('v_attr').textContent = attr;
+
+  // 年人力总成本（万元）
+  const totalLabor = emp * cost;
+
+  // 超员成本（订单下滑时）
+  let overCost = 0;
+  if(fluc < 0){
+    overCost = Math.abs(fluc) / 100 * totalLabor;
+  }
+
+  // 缺员损失（订单上涨时）—— 按缺口×人均产值×利润率估算
+  let shortLoss = 0;
+  if(fluc > 0){
+    const gap = emp * fluc / 100;
+    // 假设人均产值 = 人均成本 × 4（制造业人效倍数），利润率15%
+    shortLoss = gap * cost * 4 * 0.15;
+  }
+
+  // 招聘成本浪费 = 离职人数 × (3个月工资 + 培训)
+  const leavers = emp * attr / 100;
+  const waste = leavers * cost * 0.25; // 每人浪费约3个月工资
+
+  // AI优化后节省 = 年人工预算 × 10%
+  const aiSave = totalLabor * 0.10;
+
+  // 流失风险员工数（RF预测，约离职人数的2-3倍有风险）
+  const riskCount = Math.round(leavers * 2.5);
+
+  // 回本周期：投入按年节省的30%，月节省倒推
+  const invest = aiSave * 0.30;
+  const monthlySave = aiSave / 12;
+  const roi = monthlySave > 0 ? (invest / monthlySave).toFixed(1) : 0;
+
+  $('o_over').textContent = overCost.toFixed(0);
+  $('o_short').textContent = shortLoss.toFixed(0);
+  $('o_waste').textContent = waste.toFixed(0);
+  $('o_save').textContent = aiSave.toFixed(0);
+  $('o_risk').textContent = riskCount;
+  $('o_roi').textContent = roi;
+
+  // 三阶段对比
+  const stage1 = totalLabor;
+  const stage2 = totalLabor + overCost + shortLoss;
+  const stage3 = totalLabor + overCost + shortLoss - aiSave - waste; // AI优化：省10%+减少招聘浪费
+
+  const maxV = Math.max(stage1, stage2, stage3);
+  const h = v => Math.max(4, v / maxV * 160);
+  $('b1').style.height = h(stage1) + 'px';
+  $('b2').style.height = h(stage2) + 'px';
+  $('b3').style.height = h(Math.max(stage3,0)) + 'px';
+  $('cv1').textContent = stage1.toFixed(0) + '万';
+  $('cv2').textContent = stage2.toFixed(0) + '万';
+  $('cv3').textContent = Math.max(stage3,0).toFixed(0) + '万';
+
+  // 投资建议
+  const totalLoss = overCost + shortLoss + waste;
+  const adv = $('advice');
+  const txt = $('adviceText');
+  adv.className = 'advice';
+  if(totalLoss > totalLabor * 0.15){
+    adv.classList.add('high');
+    txt.innerHTML = `当前人力成本浪费 <b style="color:#f87171">${totalLoss.toFixed(0)}万</b>，占年人工预算 <b>${(totalLoss/totalLabor*100).toFixed(1)}%</b>。<br>订单波动+高离职率正在吞噬利润，建议尽快引入AI人力规划，预计年省 <b style="color:#34d399">${aiSave.toFixed(0)}万</b>。`;
+  } else if(totalLoss > totalLabor * 0.05){
+    adv.classList.add('mid');
+    txt.innerHTML = `当前人力成本浪费 <b style="color:#fbbf24">${totalLoss.toFixed(0)}万</b>，处于中等风险。<br>建议试点AI人力规划，8-12周验证效果，预计年省 <b style="color:#34d399">${aiSave.toFixed(0)}万</b>。`;
+  } else {
+    adv.classList.add('low');
+    txt.innerHTML = `当前人力成本浪费 <b style="color:#34d399">${totalLoss.toFixed(0)}万</b>，风险可控。<br>可关注员工流失预警模块，提前留人，预计年省 <b style="color:#34d399">${aiSave.toFixed(0)}万</b>。`;
+  }
+}
+
+function loadCase(type){
+  if(type==='xingyu'){ setVals(7532,-20,17.4,27.8,15); }
+  else if(type==='mid'){ setVals(2000,-10,15,25,18); }
+  else if(type==='small'){ setVals(500,10,12,20,20); }
+  calc();
+}
+function setVals(e,f,c,o,a){
+  $('emp').value=e; $('fluc').value=f; $('cost').value=c; $('out').value=o; $('attr').value=a;
+}
+calc();
+</script>
+</body>
+</html>
