@@ -3,386 +3,582 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>零部件供应商降本测算器</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<title>人力规划智能决策看板</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <style>
-  :root{
-    --bg:#07090d;
-    --card:#0f141c;
-    --line:#1e2633;
-    --green:#00e676;
-    --red:#ff5252;
-    --blue:#448aff;
-    --purple:#b388ff;
-    --amber:#ffd740;
-    --text:#e6edf3;
-    --muted:#8b949e;
-  }
-  *{box-sizing:border-box}
-  body{
-    background:var(--bg);
-    color:var(--text);
-    font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;
-    margin:0;
-    min-height:100vh;
-    line-height:1.6;
-  }
-  .gradient-text{
-    background:linear-gradient(90deg,#00e676,#448aff);
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-    background-clip:text;
-  }
-  .card{
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:16px;
-    padding:24px;
-  }
-  .badge{
-    display:inline-block;
-    padding:2px 10px;
-    border-radius:999px;
-    font-size:12px;
-    font-weight:600;
-  }
-  .badge-red{background:rgba(255,82,82,.15);color:var(--red);border:1px solid rgba(255,82,82,.3)}
-  .badge-green{background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3)}
-  .badge-amber{background:rgba(255,215,64,.15);color:var(--amber);border:1px solid rgba(255,215,64,.3)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#081022;color:#c0d4f1;font-family:'Segoe UI','Microsoft YaHei',sans-serif;font-size:13px;line-height:1.5;display:flex;min-height:100vh}
 
-  input[type=range]{
-    -webkit-appearance:none;
-    width:100%;
-    height:8px;
-    border-radius:4px;
-    background:var(--line);
-    outline:none;
-  }
-  input[type=range]::-webkit-slider-thumb{
-    -webkit-appearance:none;
-    width:24px;height:24px;
-    border-radius:50%;
-    background:var(--green);
-    cursor:pointer;
-    box-shadow:0 0 14px rgba(0,230,118,.7);
-    transition:transform .15s;
-  }
-  input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
-  input[type=range]::-moz-range-thumb{
-    width:24px;height:24px;border:none;border-radius:50%;
-    background:var(--green);cursor:pointer;
-  }
+/* 左侧导航 */
+.sidebar{width:200px;background:linear-gradient(180deg,#0a1628 0%,#0d1b2a 100%);border-right:1px solid rgba(64,158,255,.12);display:flex;flex-direction:column;flex-shrink:0}
+.logo{padding:20px 18px;border-bottom:1px solid rgba(64,158,255,.12)}
+.logo h2{font-size:15px;color:#e5edf7;font-weight:700}
+.logo h2 span{color:#409eff}
+.logo p{font-size:10px;color:#5a7a9e;margin-top:4px}
+.nav{padding:16px 10px;flex:1}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;color:#8aa4c4;font-size:13px;cursor:pointer;transition:all .2s;margin-bottom:2px}
+.nav-item:hover{background:rgba(64,158,255,.08);color:#c0d4f1}
+.nav-item.active{background:linear-gradient(90deg,rgba(64,158,255,.18),rgba(64,158,255,.05));color:#409eff;border-left:3px solid #409eff;padding-left:11px}
+.nav-item .ico{font-size:16px;width:20px;text-align:center}
+.sidebar-footer{padding:14px 18px;border-top:1px solid rgba(64,158,255,.12);font-size:11px;color:#5a7a9e}
+.user-box{display:flex;align-items:center;gap:10px;padding:12px}
+.user-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#409eff,#6366f1);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px}
 
-  .num-roll{
-    font-variant-numeric:tabular-nums;
-    font-weight:800;
-    transition:color .3s;
-  }
+/* 主区 */
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{background:rgba(10,22,40,.9);backdrop-filter:blur(10px);border-bottom:1px solid rgba(64,158,255,.12);padding:14px 24px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
+.topbar-left{display:flex;align-items:center;gap:16px}
+.breadcrumb{font-size:12px;color:#5a7a9e}
+.breadcrumb b{color:#c0d4f1}
+.topbar-right{display:flex;gap:14px;align-items:center;font-size:12px;color:#8aa4c4}
+.live-dot{display:inline-block;width:7px;height:7px;background:#34d399;border-radius:50%;margin-right:5px;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
 
-  .pulse-dot{
-    width:8px;height:8px;border-radius:50%;
-    background:var(--red);
-    box-shadow:0 0 10px var(--red);
-    animation:pulse 1.5s infinite;
-    display:inline-block;
-  }
-  @keyframes pulse{
-    0%,100%{opacity:1}
-    50%{opacity:.3}
-  }
+.content{padding:20px 24px;flex:1}
 
-  .tag-source{
-    font-size:11px;color:var(--muted);
-    background:rgba(139,148,158,.1);
-    padding:2px 8px;border-radius:4px;
-  }
+/* 筛选栏 */
+.filter-bar{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.filter{background:rgba(16,32,64,.6);border:1px solid rgba(64,158,255,.25);border-radius:8px;padding:8px 14px;font-size:12px;color:#a0b8e0;display:flex;align-items:center;gap:6px}
+.filter select{background:transparent;border:none;color:#c0d4f1;font-size:12px;outline:none;cursor:pointer}
+.filter select option{background:#0a1628}
 
-  .grid-bg{
-    background-image:
-      linear-gradient(rgba(68,138,255,.05) 1px,transparent 1px),
-      linear-gradient(90deg,rgba(68,138,255,.05) 1px,transparent 1px);
-    background-size:40px 40px;
-  }
+/* Tab */
+.tabs{display:flex;gap:6px;margin-bottom:18px;border-bottom:1px solid rgba(64,158,255,.15)}
+.tab{padding:10px 20px;font-size:13px;color:#5a7a9e;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.tab:hover{color:#8aa4c4}
+.tab.active{color:#409eff;border-bottom-color:#409eff}
 
-  .result-card{
-    border-radius:14px;
-    padding:20px;
-    transition:all .3s;
-  }
+/* KPI卡片 */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.kpi-card{background:rgba(16,32,64,.6);border:1px solid rgba(64,158,255,.2);border-radius:12px;padding:16px;position:relative;overflow:hidden;transition:all .25s}
+.kpi-card:hover{border-color:rgba(64,158,255,.5);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.kpi-card .klabel{font-size:11px;color:#8aa4c4;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.kpi-card .kval{font-size:26px;font-weight:800;color:#e5edf7}
+.kpi-card .kval.green{color:#34d399}
+.kpi-card .kval.blue{color:#409eff}
+.kpi-card .kval.orange{color:#fbbf24}
+.kpi-card .kval.red{color:#f87171}
+.kpi-card .kval.purple{color:#a78bfa}
+.kpi-card .ktrend{font-size:11px;margin-top:6px;display:flex;align-items:center;gap:4px}
+.kpi-card .ktrend.up{color:#34d399}
+.kpi-card .ktrend.down{color:#f87171}
+.kpi-card .spark{position:absolute;right:10px;bottom:10px;width:70px;height:28px;opacity:.7}
 
-  .glow-green{animation:glowG 2s infinite}
-  @keyframes glowG{
-    0%,100%{box-shadow:0 0 15px rgba(0,230,118,.2)}
-    50%{box-shadow:0 0 30px rgba(0,230,118,.5)}
-  }
+/* 图表面板 */
+.panel{background:rgba(16,32,64,.6);border:1px solid rgba(64,158,255,.2);border-radius:12px;padding:18px;margin-bottom:16px;position:relative}
+.panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(64,158,255,.5),transparent)}
+.panel h3{font-size:14px;color:#e5edf7;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center}
+.panel h3 .sub{font-size:11px;color:#5a7a9e;font-weight:400}
+.chart{width:100%;height:260px;margin-top:8px}
+.chart-sm{height:200px}
+.chart-lg{height:320px}
 
-  @media(max-width:640px){
-    .card{padding:16px}
-  }
+.grid{display:grid;gap:16px;margin-bottom:16px}
+.grid-2{grid-template-columns:1.3fr 1fr}
+.grid-2e{grid-template-columns:1fr 1fr}
+.grid-3{grid-template-columns:1fr 1fr 1fr}
+.grid-13{grid-template-columns:1fr 2fr}
+
+/* 表格 */
+.tbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+.tbl th,.tbl td{padding:10px 8px;text-align:left;border-bottom:1px solid rgba(64,158,255,.1)}
+.tbl th{color:#5a7a9e;font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:.5px;position:sticky;top:0}
+.tbl td{color:#a0b8e0}
+.tbl tr:hover{background:rgba(64,158,255,.06)}
+.badge{padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
+.badge-red{background:rgba(248,113,113,.15);color:#f87171}
+.badge-orange{background:rgba(251,191,36,.15);color:#fbbf24}
+.badge-green{background:rgba(52,211,153,.15);color:#34d399}
+.badge-blue{background:rgba(64,158,255,.15);color:#409eff}
+
+/* 离职记录 */
+.emp-list{margin-top:8px;max-height:320px;overflow-y:auto}
+.emp-list::-webkit-scrollbar{width:4px}
+.emp-list::-webkit-scrollbar-thumb{background:rgba(64,158,255,.3);border-radius:2px}
+.emp-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(64,158,255,.08)}
+.emp-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#409eff,#6366f1);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:12px;flex-shrink:0}
+.emp-info{flex:1}
+.emp-name{font-size:13px;color:#e5edf7;font-weight:600}
+.emp-dept{font-size:11px;color:#5a7a9e}
+.emp-meta{font-size:11px;color:#5a7a9e;text-align:right}
+
+/* 部门条形 */
+.dbar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.dbar-row .dn{font-size:11px;color:#8aa4c4;width:80px}
+.dbar-row .db{flex:1;height:14px;background:rgba(64,158,255,.1);border-radius:3px;position:relative;overflow:hidden}
+.dbar-row .df{height:100%;border-radius:3px;background:linear-gradient(90deg,#409eff,#34d399)}
+.dbar-row .dv{font-size:11px;color:#a0b8e0;width:44px;text-align:right}
+
+/* 滑块交互区 */
+.slider-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0}
+.slider-box{background:rgba(8,16,34,.6);border:1px solid rgba(64,158,255,.15);border-radius:8px;padding:12px}
+.slider-box label{font-size:11px;color:#5a7a9e}
+.slider-box .sv{font-size:20px;font-weight:800;color:#34d399;margin:4px 0}
+.slider-box input[type=range]{width:100%;accent-color:#34d399}
+
+.alert-list{margin-top:8px}
+.alert-item{display:flex;align-items:center;gap:10px;padding:10px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.15);border-radius:8px;margin-bottom:8px;border-left:3px solid #f87171}
+.alert-item.warn{background:rgba(251,191,36,.06);border-color:rgba(251,191,36,.15);border-left-color:#fbbf24}
+.alert-item.ok{background:rgba(52,211,153,.06);border-color:rgba(52,211,153,.15);border-left-color:#34d399}
+.alert-ico{font-size:18px}
+.alert-txt{flex:1;font-size:12px;color:#a0b8e0}
+.alert-txt b{color:#e5edf7}
+.alert-score{font-size:16px;font-weight:800}
+
+@media(max-width:1200px){
+  .sidebar{display:none}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .grid-2,.grid-2e,.grid-3,.grid-13{grid-template-columns:1fr}
+}
 </style>
 </head>
-<body class="grid-bg">
+<body>
 
-<div class="max-w-2xl mx-auto px-4 py-8">
+<!-- 左侧导航 -->
+<aside class="sidebar">
+  <div class="logo">
+    <h2>人力<span>决策</span>中心</h2>
+    <p>Workforce Analytics · v3.2</p>
+  </div>
+  <div class="nav">
+    <div class="nav-item active"><span class="ico">📊</span>决策总览</div>
+    <div class="nav-item"><span class="ico">👥</span>在职人数</div>
+    <div class="nav-item"><span class="ico">📉</span>流失分析</div>
+    <div class="nav-item"><span class="ico">💰</span>成本优化</div>
+    <div class="nav-item"><span class="ico">🎯</span>需求预测</div>
+    <div class="nav-item"><span class="ico">📋</span>排班管理</div>
+    <div class="nav-item"><span class="ico">⚙️</span>系统设置</div>
+  </div>
+  <div class="user-box">
+    <div class="user-av">HR</div>
+    <div><div style="color:#e5edf7;font-size:12px;font-weight:600">HR总监</div><div style="color:#5a7a9e;font-size:10px">在线</div></div>
+  </div>
+</aside>
 
-  <!-- Header -->
-  <div class="text-center mb-8">
-    <div class="flex items-center justify-center gap-2 mb-3">
-      <span class="pulse-dot"></span>
-      <span class="badge badge-red">大客户压价30% · 供应链测算</span>
+<!-- 主区 -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="breadcrumb">人力决策中心 / <b>决策总览</b></div>
     </div>
-    <h1 class="text-3xl md:text-4xl font-extrabold mb-2">
-      你的企业还能<span class="gradient-text">撑多久</span>？
-    </h1>
-    <p class="text-gray-400 text-sm">被大客户压价 30%，用 AI 优化能省多少？填 4 个数，实时出结果</p>
+    <div class="topbar-right">
+      <span><span class="live-dot"></span>实时同步</span>
+      <span id="clock"></span>
+    </div>
   </div>
 
-  <!-- Input -->
-  <div class="card mb-5">
-    <h2 class="font-bold text-lg mb-5 text-gray-200">📝 输入你的企业参数</h2>
+  <div class="content">
+    <!-- 筛选栏 -->
+    <div class="filter-bar">
+      <div class="filter">时间范围 <select><option>近12个月</option><option>近6个月</option><option>本季度</option><option>本月</option></select></div>
+      <div class="filter">部门 <select><option>全部</option><option>冲压车间</option><option>焊接车间</option><option>装配车间</option><option>质检部</option><option>仓储物流</option><option>技术研发</option><option>销售部</option><option>设备维修</option></select></div>
+      <div class="filter">用工类型 <select><option>全部</option><option>正式工</option><option>外包</option><option>实习生</option></select></div>
+      <div class="filter">岗位层级 <select><option>全部</option><option>操作层</option><option>技术层</option><option>管理层</option></select></div>
+      <div class="filter">员工状态 <select><option>全部</option><option>在职</option><option>休假</option><option>离职预警</option></select></div>
+    </div>
 
-    <div class="space-y-6">
-      <div>
-        <div class="flex justify-between items-center mb-2">
-          <label class="text-sm text-gray-400">供应商依赖度（对最大客户）</label>
-          <span class="num-roll text-2xl text-blue-300" id="depVal">60</span><span class="text-gray-500 text-sm ml-1">%</span>
-        </div>
-        <input type="range" id="dep" min="30" max="100" value="60" step="1">
-        <div class="flex justify-between text-xs text-gray-600 mt-1"><span>30%</span><span>100%</span></div>
+    <!-- Tab -->
+    <div class="tabs">
+      <div class="tab active">📊 总览</div>
+      <div class="tab">👥 在职分析</div>
+      <div class="tab">📉 流失分析</div>
+      <div class="tab">💰 成本优化</div>
+      <div class="tab">🤖 AI预测</div>
+    </div>
+
+    <!-- KPI卡片 -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="klabel">在职总人数 <span class="badge badge-blue">在编</span></div>
+        <div class="kval blue">3,218</div>
+        <div class="ktrend up">▲ 1.2% 较上月</div>
+        <div class="spark" id="spark1"></div>
       </div>
-
-      <div>
-        <div class="flex justify-between items-center mb-2">
-          <label class="text-sm text-gray-400">降价压力（被大客户要求降价）</label>
-          <span class="num-roll text-2xl text-red-400" id="cutVal">30</span><span class="text-gray-500 text-sm ml-1">%</span>
-        </div>
-        <input type="range" id="cut" min="5" max="40" value="30" step="1">
-        <div class="flex justify-between text-xs text-gray-600 mt-1"><span>5%</span><span>40%</span></div>
+      <div class="kpi-card">
+        <div class="klabel">月度净变动 <span class="badge badge-green">+38</span></div>
+        <div class="kval green">+38</div>
+        <div class="ktrend up">▲ 23入职 · 10离职</div>
+        <div class="spark" id="spark2"></div>
       </div>
+      <div class="kpi-card">
+        <div class="klabel">年化离职率 <span class="badge badge-orange">关注</span></div>
+        <div class="kval orange">11.8%</div>
+        <div class="ktrend down">▼ 0.6pt 较上期</div>
+        <div class="spark" id="spark3"></div>
+      </div>
+      <div class="kpi-card">
+        <div class="klabel">平均司龄</div>
+        <div class="kval purple">3.1年</div>
+        <div class="ktrend up">▲ 0.1年 稳定性提升</div>
+        <div class="spark" id="spark4"></div>
+      </div>
+      <div class="kpi-card">
+        <div class="klabel">编制达成率</div>
+        <div class="kval green">98.9%</div>
+        <div class="ktrend down">▼ 缺口34人</div>
+        <div class="spark" id="spark5"></div>
+      </div>
+      <div class="kpi-card">
+        <div class="klabel">产能利用率</div>
+        <div class="kval blue">87.3%</div>
+        <div class="ktrend up">▲ 2.1pt 效率提升</div>
+        <div class="spark" id="spark6"></div>
+      </div>
+      <div class="kpi-card">
+        <div class="klabel">人力成本 / 月</div>
+        <div class="kval red">4,042万</div>
+        <div class="ktrend down">▼ 8.7% AI优化后</div>
+        <div class="spark" id="spark7"></div>
+      </div>
+      <div class="kpi-card">
+        <div class="klabel">AI优化年节省</div>
+        <div class="kval green">4,230万</div>
+        <div class="ktrend up">▲ 占人力成本8.7%</div>
+        <div class="spark" id="spark8"></div>
+      </div>
+    </div>
 
-      <div>
-        <div class="flex justify-between items-center mb-2">
-          <label class="text-sm text-gray-400">当前年营收</label>
-          <div class="flex items-center gap-1">
-            <input type="number" id="rev" value="10000" min="100" class="w-28 bg-transparent border-b border-gray-600 text-right text-2xl text-green-300 num-roll focus:outline-none focus:border-green-400">
-            <span class="text-gray-500 text-sm ml-1">万元</span>
+    <!-- 第一行：趋势 + 入离职 -->
+    <div class="grid grid-2">
+      <div class="panel">
+        <h3>在职人数趋势 <span class="sub">月末在职 · 分用工类型 · 目标区间</span></h3>
+        <div class="chart" id="chart-trend"></div>
+      </div>
+      <div class="panel">
+        <h3>入职 vs 离职 & 离职率 <span class="sub">月度流动 · 双轴</span></h3>
+        <div class="chart" id="chart-flow"></div>
+      </div>
+    </div>
+
+    <!-- 第二行：部门 + 用工类型 + 司龄 -->
+    <div class="grid grid-3">
+      <div class="panel">
+        <h3>各部门人数 <span class="sub">8个部门</span></h3>
+        <div id="dept-bars" style="margin-top:12px"></div>
+      </div>
+      <div class="panel">
+        <h3>用工类型分布 <span class="sub">正式/外包/实习</span></h3>
+        <div class="chart chart-sm" id="chart-type"></div>
+      </div>
+      <div class="panel">
+        <h3>司龄分布 <span class="sub">平均3.1年</span></h3>
+        <div class="chart chart-sm" id="chart-tenure"></div>
+      </div>
+    </div>
+
+    <!-- 第三行：离职率表 + 离职记录 -->
+    <div class="grid grid-2">
+      <div class="panel">
+        <h3>各部门离职率 <span class="sub">近12个月 · 按离职率降序</span></h3>
+        <table class="tbl">
+          <thead><tr><th>部门</th><th>人数</th><th>离职</th><th>离职率</th><th>平均司龄</th><th>趋势</th><th>AI建议</th></tr></thead>
+          <tbody>
+            <tr><td>销售部</td><td>128</td><td>24</td><td><span class="badge badge-red">18.1%</span></td><td>2.1年</td><td style="color:#f87171">▲</td><td style="color:#f87171">重点留人</td></tr>
+            <tr><td>仓储物流</td><td>280</td><td>42</td><td><span class="badge badge-red">15.0%</span></td><td>1.8年</td><td style="color:#f87171">▲</td><td style="color:#fbbf24">增外包</td></tr>
+            <tr><td>冲压车间</td><td>520</td><td>68</td><td><span class="badge badge-orange">13.1%</span></td><td>2.3年</td><td style="color:#fbbf24">→</td><td style="color:#fbbf24">弹性用工</td></tr>
+            <tr><td>焊接车间</td><td>380</td><td>44</td><td><span class="badge badge-orange">11.6%</span></td><td>2.6年</td><td style="color:#fbbf24">→</td><td style="color:#34d399">自动化</td></tr>
+            <tr><td>装配车间</td><td>640</td><td>68</td><td><span class="badge badge-orange">10.6%</span></td><td>2.8年</td><td style="color:#34d399">▼</td><td style="color:#34d399">稳定</td></tr>
+            <tr><td>质检部</td><td>210</td><td>18</td><td><span class="badge badge-green">8.6%</span></td><td>3.4年</td><td style="color:#34d399">▼</td><td style="color:#34d399">保留正式</td></tr>
+            <tr><td>技术研发</td><td>210</td><td>14</td><td><span class="badge badge-green">6.7%</span></td><td>3.8年</td><td style="color:#34d399">▼</td><td style="color:#409eff">增编30人</td></tr>
+            <tr><td>设备维修</td><td>98</td><td>5</td><td><span class="badge badge-green">5.1%</span></td><td>4.2年</td><td style="color:#34d399">▼</td><td style="color:#34d399">核心留人</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="panel">
+        <h3>近期离职记录 <span class="sub">近30天 · 遗憾/非遗憾</span></h3>
+        <div class="emp-list" id="emp-list"></div>
+      </div>
+    </div>
+
+    <!-- 第四行：成本对比 + 季度成本趋势 -->
+    <div class="grid grid-2e">
+      <div class="panel">
+        <h3>正式工 vs 外包成本对比 <span class="sub">人均年成本 · 3倍差异</span></h3>
+        <div class="chart chart-sm" id="chart-cost-compare"></div>
+      </div>
+      <div class="panel">
+        <h3>季度人力成本趋势 <span class="sub">传统 vs AI优化</span></h3>
+        <div class="chart chart-sm" id="chart-cost-trend"></div>
+      </div>
+    </div>
+
+    <!-- 第五行：部门超员热力图 + 雷达图 -->
+    <div class="grid grid-2e">
+      <div class="panel">
+        <h3>部门超员/缺员热力图 <span class="sub">绿=合理 · 橙=超员 · 红=缺员</span></h3>
+        <div class="chart" id="chart-heatmap"></div>
+      </div>
+      <div class="panel">
+        <h3>部门健康度雷达图 <span class="sub">稳定性/成本/效率/满意度/流失</span></h3>
+        <div class="chart" id="chart-radar"></div>
+      </div>
+    </div>
+
+    <!-- 第六行：AI预测交互 + 产能仪表盘 + 流失因素 -->
+    <div class="grid grid-13">
+      <div class="panel">
+        <h3>产能利用率 <span class="sub">实时</span></h3>
+        <div class="chart" id="chart-gauge" style="height:220px"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+          <div style="background:rgba(8,16,34,.6);padding:10px;border-radius:6px;text-align:center">
+            <div style="font-size:11px;color:#5a7a9e">今日出勤</div>
+            <div style="font-size:20px;font-weight:800;color:#409eff">2,986</div>
+          </div>
+          <div style="background:rgba(8,16,34,.6);padding:10px;border-radius:6px;text-align:center">
+            <div style="font-size:11px;color:#5a7a9e">在岗率</div>
+            <div style="font-size:20px;font-weight:800;color:#34d399">92.8%</div>
           </div>
         </div>
       </div>
-
-      <div>
-        <div class="flex justify-between items-center mb-2">
-          <label class="text-sm text-gray-400">当前利润率</label>
-          <span class="num-roll text-2xl text-amber-300" id="marginVal">5</span><span class="text-gray-500 text-sm ml-1">%</span>
+      <div class="panel">
+        <h3>AI人力需求预测 <span class="sub">Erlang C · 拖动参数实时计算</span></h3>
+        <div class="slider-row">
+          <div class="slider-box">
+            <label>30分钟订单量</label>
+            <div class="sv" id="arr-v">100</div>
+            <input type="range" id="arr" min="30" max="250" value="100">
+          </div>
+          <div class="slider-box">
+            <label>单件处理(秒)</label>
+            <div class="sv" id="aht-v">180s</div>
+            <input type="range" id="aht" min="60" max="600" value="180" step="10">
+          </div>
         </div>
-        <input type="range" id="margin" min="0" max="30" value="5" step="0.5">
-        <div class="flex justify-between text-xs text-gray-600 mt-1"><span>0%</span><span>30%</span></div>
+        <div class="chart chart-sm" id="chart-demand"></div>
+        <div style="font-size:12px;color:#8aa4c4;margin-top:8px;line-height:1.7" id="demand-insight"></div>
       </div>
     </div>
 
-    <!-- Quick cases -->
-    <div class="border-t border-gray-800 mt-6 pt-4">
-      <div class="text-xs text-gray-500 mb-2">⚡ 真实案例一键套用</div>
-      <div class="flex flex-wrap gap-2">
-        <button onclick="applyCase('a')" class="text-xs px-3 py-1.5 rounded-lg bg-amber-900/30 text-amber-300 border border-amber-700/50 hover:bg-amber-900/50 transition">TS Tech 90%依赖</button>
-        <button onclick="applyCase('b')" class="text-xs px-3 py-1.5 rounded-lg bg-amber-900/30 text-amber-300 border border-amber-700/50 hover:bg-amber-900/50 transition">H-One 86%依赖</button>
-        <button onclick="applyCase('c')" class="text-xs px-3 py-1.5 rounded-lg bg-green-900/30 text-green-300 border border-green-700/50 hover:bg-green-900/50 transition">本田 0.3%利润</button>
+    <!-- 第七行：流失因素 + 离职预警列表 -->
+    <div class="grid grid-2">
+      <div class="panel">
+        <h3>流失关键因素 <span class="sub">SHAP 可解释性分析</span></h3>
+        <div class="chart" id="chart-shap" style="height:300px"></div>
+      </div>
+      <div class="panel">
+        <h3>AI离职预警名单 <span class="sub">高风险员工 · 主动留人</span></h3>
+        <div class="alert-list" id="alert-list"></div>
       </div>
     </div>
+
+    <div style="margin-top:16px;text-align:center;font-size:11px;color:#3a5a7e">基于人力规划运筹模型(Erlang C) + XGBoost流失预测(SHAP可解释) · 数据为制造业示例，可对接企业真实数据源</div>
   </div>
-
-  <!-- Results -->
-  <div class="card mb-5">
-    <h2 class="font-bold text-lg mb-5 text-gray-200">📊 实时测算结果</h2>
-
-    <!-- Big number: after cut -->
-    <div class="result-card mb-4" style="background:linear-gradient(135deg,rgba(255,82,82,.1),transparent);border:1px solid rgba(255,82,82,.3)">
-      <div class="text-xs text-red-300 mb-1">被压价后利润率</div>
-      <div class="flex items-baseline gap-2">
-        <span class="num-roll text-5xl" id="afterMargin" style="color:var(--red)">-13.0</span>
-        <span class="text-gray-500 text-lg">%</span>
-      </div>
-      <div class="text-xs text-gray-500 mt-1">= 当前利润率 − 依赖度 × 降价幅度</div>
-    </div>
-
-    <!-- Big number: AI optimized -->
-    <div class="result-card glow-green" style="background:linear-gradient(135deg,rgba(0,230,118,.1),transparent);border:1px solid rgba(0,230,118,.4)">
-      <div class="flex justify-between items-start mb-2">
-        <div class="text-xs text-green-300">AI 优化后利润率</div>
-        <div class="text-right text-xs space-y-0.5">
-          <div class="text-green-300">库存 -32% <span class="tag-source">McKinsey</span></div>
-          <div class="text-green-300">停机 -73% <span class="tag-source">McKinsey</span></div>
-        </div>
-      </div>
-      <div class="flex items-baseline gap-2">
-        <span class="num-roll text-5xl" id="aiMargin" style="color:var(--green)">8.3</span>
-        <span class="text-gray-500 text-lg">%</span>
-      </div>
-      <div class="text-xs text-gray-500 mt-1">准确率 71% → 94%，烂单砍掉，少亏就是赚</div>
-    </div>
-
-    <!-- Savings -->
-    <div class="mt-4 p-4 rounded-xl bg-black/30 border border-gray-800">
-      <div class="flex justify-between items-center mb-3">
-        <span class="text-sm text-gray-400">💰 AI 年节省金额</span>
-        <div class="flex items-baseline gap-1">
-          <span class="num-roll text-3xl text-green-400" id="savings">2,134</span>
-          <span class="text-gray-500 text-sm">万元/年</span>
-        </div>
-      </div>
-      <div class="space-y-1.5 text-sm">
-        <div class="flex justify-between text-gray-400">
-          <span>库存降 32% 节省</span>
-          <span class="text-green-300 num-roll" id="saveInv">800</span>
-        </div>
-        <div class="flex justify-between text-gray-400">
-          <span>停机降 73% 节省</span>
-          <span class="text-green-300 num-roll" id="saveDown">584</span>
-        </div>
-        <div class="flex justify-between text-gray-400">
-          <span>烂单砍掉减亏</span>
-          <span class="text-green-300 num-roll" id="saveBad">750</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Comparison chart -->
-    <div class="mt-4 p-4 rounded-xl bg-black/30 border border-gray-800">
-      <div class="text-sm text-gray-300 mb-3 font-semibold">📊 利润率三阶段对比</div>
-      <div class="flex items-end justify-around gap-4 h-32 px-2">
-        <div class="flex flex-col items-center gap-1" style="flex:1">
-          <div class="text-xs text-gray-400" id="bar1Val">5.0%</div>
-          <div class="w-full rounded-t" id="bar1" style="height:50%;background:linear-gradient(180deg,#448aff,#2962ff)"></div>
-          <div class="text-xs text-gray-500">压价前</div>
-        </div>
-        <div class="flex flex-col items-center gap-1" style="flex:1">
-          <div class="text-xs text-gray-400" id="bar2Val">-13.0%</div>
-          <div class="w-full rounded-t" id="bar2" style="height:20%;background:linear-gradient(180deg,#ff5252,#c62828)"></div>
-          <div class="text-xs text-gray-500">被压价后</div>
-        </div>
-        <div class="flex flex-col items-center gap-1" style="flex:1">
-          <div class="text-xs text-green-300" id="bar3Val">8.3%</div>
-          <div class="w-full rounded-t" id="bar3" style="height:70%;background:linear-gradient(180deg,#00e676,#00a152)"></div>
-          <div class="text-xs text-green-400">AI优化后</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ROI payback -->
-    <div class="mt-4 p-4 rounded-xl bg-gradient-to-r from-green-950/30 to-emerald-950/30 border border-green-800/40">
-      <div class="flex justify-between items-center">
-        <div>
-          <div class="text-xs text-green-300 mb-1">💰 投入回本周期</div>
-          <div class="text-2xl font-bold text-green-400" id="payback">1.7 个月</div>
-        </div>
-        <div class="text-right text-xs text-gray-400">
-          <div>AI方案投入 ≈ 年节省×30%</div>
-          <div>月节省 × N ≥ 投入</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Advice -->
-    <div class="mt-4 p-4 rounded-xl bg-purple-950/20 border border-purple-800/40">
-      <div class="text-xs text-purple-300 mb-2">💡 建议</div>
-      <div id="advice" class="text-sm text-gray-200 leading-relaxed"></div>
-    </div>
-  </div>
-
-  <!-- Data source note -->
-  <div class="text-center text-xs text-gray-600 px-4">
-    测算基准：麦肯锡报告（AI 装配线准确率 85%+、库存 -32%、停机 -73%、71%→94%）<br>
-    本田案例为公开行业信息。本测算器为自研工具。
-  </div>
-
-  <!-- Links -->
-  <div class="flex items-center justify-center gap-6 text-sm mt-6 pb-6">
-    <a href="index.html" class="text-gray-400 hover:text-white transition">← 返回方案页</a>
-  </div>
-
 </div>
 
 <script>
-  const $ = id => document.getElementById(id);
+// 通用深色配置
+const DC={tooltip:{backgroundColor:'rgba(13,27,58,.92)',borderColor:'rgba(64,158,255,.35)',textStyle:{color:'#fff'},padding:10,borderRadius:6},
+  legend:{textStyle:{color:'#a0b8e0',fontSize:11}},
+  grid:{left:'3%',right:'4%',bottom:'6%',top:'18%',containLabel:true}}
+const AX={axisLine:{lineStyle:{color:'rgba(64,158,255,.25)'}},axisTick:{show:false},axisLabel:{color:'#8aa4c4',fontSize:10},splitLine:{lineStyle:{color:'rgba(64,158,255,.08)'}}}
 
-  function calc(){
-    const dep = +$('dep').value;
-    const cut = +$('cut').value;
-    const rev = +$('rev').value || 0;
-    const margin = +$('margin').value;
+function tick(){document.getElementById('clock').textContent=new Date().toLocaleString('zh-CN')}
+setInterval(tick,1000);tick()
 
-    $('depVal').textContent = dep;
-    $('cutVal').textContent = cut;
-    $('marginVal').textContent = margin;
+const months=['7月','8月','9月','10月','11月','12月','1月','2月','3月','4月','5月','6月']
+const hcF=[1920,1940,1960,1990,2020,2050,2080,2110,2140,2160,2180,2200]
+const hcO=[520,540,560,580,600,620,640,660,680,700,710,720]
+const hcI=[140,145,150,155,160,165,170,172,175,178,180,198]
+const target=[2700,2750,2800,2850,2900,2950,3000,3060,3100,3150,3180,3220]
 
-    // 被压价后利润率
-    const afterMargin = margin - (dep * cut) / 100;
-    $('afterMargin').textContent = afterMargin.toFixed(1);
-    $('afterMargin').style.color = afterMargin < 0 ? 'var(--red)' : afterMargin < 2 ? 'var(--amber)' : 'var(--green)';
+// 迷你趋势
+function spark(id,data,color){
+  echarts.init(document.getElementById(id)).setOption({
+    grid:{left:0,right:0,top:0,bottom:0},
+    xAxis:{type:'category',show:false,data:data.map((_,i)=>i)},
+    yAxis:{type:'value',show:false},
+    series:[{type:'line',data,smooth:true,symbol:'none',lineStyle:{color,width:1.5},
+      areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:color+'66'},{offset:1,color:color+'00'}])}}]
+  })
+}
+spark('spark1',hcF.map((_,i)=>hcF[i]+hcO[i]+hcI[i]),'#409eff')
+spark('spark2',[12,15,18,22,19,25,21,28,24,26,23,38],'#34d399')
+spark('spark3',[9.5,10.2,8.8,11.5,10.1,11.2,9.8,10.5,9.2,10.0,9.5,11.8],'#fbbf24')
+spark('spark4',[2.6,2.7,2.7,2.8,2.8,2.9,2.9,3.0,3.0,3.0,3.1,3.1],'#a78bfa')
+spark('spark5',[95,96,96,97,97,98,98,98,99,99,99,99],'#34d399')
+spark('spark6',[80,82,83,84,85,85,86,86,87,87,87,87],'#409eff')
+spark('spark7',[4420,4400,4380,4350,4300,4250,4200,4150,4120,4080,4050,4042],'#f87171')
+spark('spark8',[0,200,500,900,1400,2000,2600,3200,3700,4000,4150,4230],'#34d399')
 
-    // AI 优化
-    const invCostRatio = 0.25;
-    const downCostRatio = 0.08;
-    const badOrderRatio = 0.075;
+// 趋势图（分类型堆叠+目标带）
+echarts.init(document.getElementById('chart-trend')).setOption({...DC,
+  legend:{...DC.legend,top:0},
+  xAxis:{type:'category',data:months,...AX},
+  yAxis:{type:'value',...AX},
+  series:[
+    {name:'目标区间',type:'line',data:target.map(t=>t+60),lineStyle:{opacity:0},stack:'b',areaStyle:{color:'rgba(64,158,255,.06)'},symbol:'none'},
+    {name:'目标区间下',type:'line',data:target.map(t=>t-60),lineStyle:{opacity:0},stack:'b',symbol:'none'},
+    {name:'正式工',type:'line',data:hcF,smooth:true,stack:'t',areaStyle:{color:'rgba(64,158,255,.25)'},lineStyle:{color:'#409eff',width:2},symbol:'circle',symbolSize:5},
+    {name:'外包',type:'line',data:hcO,smooth:true,stack:'t',areaStyle:{color:'rgba(52,211,153,.25)'},lineStyle:{color:'#34d399',width:2},symbol:'circle',symbolSize:5},
+    {name:'实习生',type:'line',data:hcI,smooth:true,stack:'t',areaStyle:{color:'rgba(167,139,250,.25)'},lineStyle:{color:'#a78bfa',width:2},symbol:'circle',symbolSize:5}
+  ]
+})
 
-    const saveInv = rev * invCostRatio * 0.32;
-    const saveDown = rev * downCostRatio * 0.73;
-    const saveBad = rev * badOrderRatio;
-    const totalSave = saveInv + saveDown + saveBad;
+// 入离职双轴
+echarts.init(document.getElementById('chart-flow')).setOption({...DC,
+  legend:{...DC.legend,top:0},
+  xAxis:{type:'category',data:months,...AX},
+  yAxis:[{type:'value',...AX},{type:'value',max:20,...AX,axisLabel:{...AX.axisLabel,formatter:'{value}%'}}],
+  series:[
+    {name:'入职',type:'bar',data:[18,22,19,25,21,28,24,26,23,27,25,23],itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#34d399'},{offset:1,color:'#0e7a5c'}]),borderRadius:[4,4,0,0]},barWidth:10},
+    {name:'离职',type:'bar',data:[8,10,7,12,9,11,8,10,7,9,8,10],itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#f87171'},{offset:1,color:'#7a2d2d'}]),borderRadius:[4,4,0,0]},barWidth:10},
+    {name:'离职率',type:'line',yAxisIndex:1,data:[9.5,10.2,8.8,11.5,10.1,11.2,9.8,10.5,9.2,10.0,9.5,11.8],smooth:true,lineStyle:{color:'#fbbf24',width:2},itemStyle:{color:'#fbbf24'},symbol:'circle',symbolSize:5}
+  ]
+})
 
-    $('saveInv').textContent = Math.round(saveInv).toLocaleString();
-    $('saveDown').textContent = Math.round(saveDown).toLocaleString();
-    $('saveBad').textContent = Math.round(saveBad).toLocaleString();
-    $('savings').textContent = Math.round(totalSave).toLocaleString();
+// 部门条形
+const depts=[{name:'装配车间',val:640},{name:'冲压车间',val:520},{name:'焊接车间',val:380},{name:'仓储物流',val:280},{name:'质检部',val:210},{name:'技术研发',val:210},{name:'销售部',val:128},{name:'设备维修',val:98}]
+const maxD=Math.max(...depts.map(d=>d.val))
+document.getElementById('dept-bars').innerHTML=depts.map(d=>`<div class="dbar-row"><span class="dn">${d.name}</span><div class="db"><div class="df" style="width:${d.val/maxD*100}%"></div></div><span class="dv">${d.val}</span></div>`).join('')
 
-    const aiMarginPct = totalSave / rev * 100;
-    const aiMargin = afterMargin + aiMarginPct;
-    $('aiMargin').textContent = aiMargin.toFixed(1);
+// 用工类型环形
+echarts.init(document.getElementById('chart-type')).setOption({...DC,
+  tooltip:{...DC.tooltip,trigger:'item'},
+  series:[{type:'pie',radius:['42%','68%'],center:['50%','50%'],
+    label:{color:'#a0b8e0',fontSize:11,formatter:'{b}\n{d}%'},
+    itemStyle:{borderColor:'#0a1628',borderWidth:2},
+    data:[{value:2200,name:'正式工',itemStyle:{color:'#409eff'}},{value:720,name:'外包',itemStyle:{color:'#34d399'}},{value:198,name:'实习生',itemStyle:{color:'#a78bfa'}}]}]
+})
 
-    // 三阶段对比柱状图
-    const maxH = 100;
-    const b1H = Math.max(5, Math.min(100, margin / 30 * maxH));
-    const b2H = Math.max(3, Math.min(100, (afterMargin + 30) / 60 * maxH));
-    const b3H = Math.max(5, Math.min(100, Math.max(0, aiMargin) / 30 * maxH));
-    $('bar1').style.height = b1H + '%';
-    $('bar2').style.height = b2H + '%';
-    $('bar3').style.height = b3H + '%';
-    $('bar1Val').textContent = margin.toFixed(1) + '%';
-    $('bar2Val').textContent = afterMargin.toFixed(1) + '%';
-    $('bar3Val').textContent = aiMargin.toFixed(1) + '%';
+// 司龄
+echarts.init(document.getElementById('chart-tenure')).setOption({...DC,
+  xAxis:{type:'category',data:['<1年','1-2年','2-4年','4-7年','7年+'],...AX},
+  yAxis:{type:'value',...AX},
+  series:[{type:'bar',data:[418,612,980,720,488],barWidth:28,
+    itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#409eff'},{offset:1,color:'#1a4a8a'}]),borderRadius:[4,4,0,0]},
+    label:{show:true,position:'top',color:'#a0b8e0',fontSize:10}}]
+})
 
-    // 回本周期：投入 = 年节省×30%，回本 = 投入 / (年节省/12) = 3.6个月
-    const payback = totalSave > 0 ? (totalSave * 0.3 / (totalSave / 12)).toFixed(1) : '—';
-    $('payback').textContent = payback + ' 个月';
+// 离职记录
+const emps=[
+  {name:'张伟',dept:'销售部',tenure:'1.4年',date:'6月5日',type:'遗憾离职',init:'ZW'},
+  {name:'李娜',dept:'装配车间',tenure:'0.9年',date:'6月3日',type:'非遗憾',init:'LN'},
+  {name:'王强',dept:'仓储物流',tenure:'2.0年',date:'6月2日',type:'遗憾离职',init:'WQ'},
+  {name:'赵敏',dept:'冲压车间',tenure:'3.2年',date:'5月28日',type:'遗憾离职',init:'ZM'},
+  {name:'陈刚',dept:'焊接车间',tenure:'1.8年',date:'5月24日',type:'非遗憾',init:'CG'},
+  {name:'刘洋',dept:'销售部',tenure:'2.7年',date:'5月21日',type:'遗憾离职',init:'LY'},
+  {name:'孙丽',dept:'装配车间',tenure:'1.1年',date:'5月18日',type:'非遗憾',init:'SL'},
+  {name:'周磊',dept:'仓储物流',tenure:'0.7年',date:'5月15日',type:'遗憾离职',init:'ZL'},
+]
+document.getElementById('emp-list').innerHTML=emps.map(e=>`<div class="emp-item"><div class="emp-avatar">${e.init}</div><div class="emp-info"><div class="emp-name">${e.name}</div><div class="emp-dept">${e.dept} · 司龄 ${e.tenure}</div></div><div class="emp-meta"><span class="badge ${e.type==='遗憾离职'?'badge-red':'badge-green'}">${e.type}</span><br>${e.date}</div></div>`).join('')
 
-    // 建议
-    let advice = '';
-    if(afterMargin < 0){
-      advice = `⚠️ <strong class="text-red-300">危险</strong>：被压价后利润率 ${afterMargin.toFixed(1)}%，已亏损。必须立即用订单分配优化砍掉亏损订单。`;
-    } else if(afterMargin < 2){
-      advice = `🔴 <strong class="text-red-300">薄利预警</strong>：利润率仅 ${afterMargin.toFixed(1)}%，接近行业危险线。建议尽快上智能排程。`;
-    } else if(afterMargin < 5){
-      advice = `🟡 <strong class="text-amber-300">承压运行</strong>：利润率 ${afterMargin.toFixed(1)}%，抗风险弱。AI优化可提升约 ${aiMarginPct.toFixed(1)} 个百分点。`;
-    } else {
-      advice = `🟢 <strong class="text-green-300">相对健康</strong>：利润率 ${afterMargin.toFixed(1)}%。但依赖度 ${dep}% 仍是隐疾，建议分散订单。`;
-    }
-    advice += `<br><br>📈 AI优化：利润率 <span class="text-red-300">${afterMargin.toFixed(1)}%</span> → <span class="text-green-300">${aiMargin.toFixed(1)}%</span>，年省 <span class="text-green-300">${Math.round(totalSave).toLocaleString()} 万</span>，约 <span class="text-green-300">${payback} 个月</span>回本。`;
-    $('advice').innerHTML = advice;
-  }
+// 成本对比
+echarts.init(document.getElementById('chart-cost-compare')).setOption({...DC,
+  tooltip:{...DC.tooltip,trigger:'axis'},
+  xAxis:{type:'category',data:['正式工','外包','实习生'],...AX},
+  yAxis:{type:'value',name:'万元/人/年',nameTextStyle:{color:'#5a7a9e',fontSize:10},...AX},
+  series:[{type:'bar',data:[17.4,5.8,3.2],barWidth:50,
+    itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#f87171'},{offset:1,color:'#7a2d2d'}]),borderRadius:[6,6,0,0]},
+    label:{show:true,position:'top',color:'#e5edf7',fontSize:13,fontWeight:'bold',formatter:'{c}万'}}]
+})
 
-  function applyCase(type){
-    if(type==='a'){ $('dep').value=90; $('cut').value=30; $('margin').value=5; }
-    else if(type==='b'){ $('dep').value=86; $('cut').value=30; $('margin').value=4; }
-    else if(type==='c'){ $('dep').value=60; $('cut').value=30; $('margin').value=0.3; }
-    calc();
-  }
+// 成本趋势
+echarts.init(document.getElementById('chart-cost-trend')).setOption({...DC,
+  legend:{...DC.legend,top:0},
+  xAxis:{type:'category',data:['Q1','Q2','Q3','Q4'],...AX},
+  yAxis:{type:'value',name:'万元',nameTextStyle:{color:'#5a7a9e',fontSize:10},...AX},
+  series:[
+    {name:'传统规划',type:'bar',data:[4420,4400,4380,4350],itemStyle:{color:'rgba(248,113,113,.6)',borderRadius:[4,4,0,0]},barWidth:24},
+    {name:'AI优化',type:'bar',data:[4200,4080,4050,4042],itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#34d399'},{offset:1,color:'#0e7a5c'}]),borderRadius:[4,4,0,0]},barWidth:24},
+    {name:'节省金额',type:'line',data:[220,320,330,308],smooth:true,lineStyle:{color:'#fbbf24',width:2},itemStyle:{color:'#fbbf24'},symbol:'circle',symbolSize:6,
+      label:{show:true,position:'top',color:'#fbbf24',fontSize:10,formatter:'+{c}'}}
+  ]
+})
 
-  ['dep','cut','margin','rev'].forEach(id=>{
-    $(id).addEventListener('input', calc);
-  });
+// 热力图
+const hmDepts=['冲压','焊接','装配','质检','仓储','技术','销售','设备']
+const hmMonths=['1月','2月','3月','4月','5月','6月']
+const hmData=[]
+for(let i=0;i<hmDepts.length;i++)for(let j=0;j<hmMonths.length;j++){
+  hmData.push([j,i,Math.round((Math.sin(i*1.3+j*.7)+1.5)*30+Math.random()*20)])
+}
+echarts.init(document.getElementById('chart-heatmap')).setOption({...DC,
+  tooltip:{...DC.tooltip,formatter:p=>`${hmDepts[p.value[1]]} · ${hmMonths[p.value[0]]}<br>超员率: ${p.value[2]}%`},
+  grid:{left:'8%',right:'4%',bottom:'12%',top:'10%'},
+  xAxis:{type:'category',data:hmMonths,splitArea:{show:true},...AX},
+  yAxis:{type:'category',data:hmDepts,splitArea:{show:true},...AX},
+  visualMap:{min:0,max:100,calculable:true,orient:'horizontal',left:'center',bottom:0,textStyle:{color:'#8aa4c4',fontSize:10},
+    inRange:{color:['#0e7a5c','#34d399','#fbbf24','#f87171']}},
+  series:[{type:'heatmap',data:hmData,label:{show:true,color:'#0a1628',fontSize:10,fontWeight:'bold'},
+    itemStyle:{borderColor:'#0a1628',borderWidth:1}}]
+})
 
-  calc();
+// 雷达图
+echarts.init(document.getElementById('chart-radar')).setOption({...DC,
+  tooltip:{...DC.tooltip},
+  legend:{...DC.legend,bottom:0},
+  radar:{indicator:[
+    {name:'稳定性',max:100},{name:'成本控制',max:100},{name:'效率',max:100},{name:'满意度',max:100},{name:'流失控制',max:100}
+  ],axisName:{color:'#8aa4c4',fontSize:11},splitLine:{lineStyle:{color:'rgba(64,158,255,.15)'}},splitArea:{areaStyle:{color:['rgba(64,158,255,.03)','rgba(64,158,255,.06)']}},axisLine:{lineStyle:{color:'rgba(64,158,255,.15)'}}},
+  series:[{type:'radar',
+    data:[
+      {value:[85,72,88,76,90],name:'AI优化后',areaStyle:{color:'rgba(52,211,153,.25)'},lineStyle:{color:'#34d399',width:2},itemStyle:{color:'#34d399'}},
+      {value:[60,45,65,52,58],name:'传统规划',areaStyle:{color:'rgba(248,113,113,.15)'},lineStyle:{color:'#f87171',width:2},itemStyle:{color:'#f87171'}}
+    ]}]
+})
+
+// 仪表盘
+echarts.init(document.getElementById('chart-gauge')).setOption({...DC,
+  series:[{type:'gauge',radius:'90%',center:['50%','58%'],
+    progress:{show:true,width:14},
+    axisLine:{lineStyle:{width:14,color:[[0.6,'#f87171'],[0.85,'#fbbf24'],[1,'#34d399']]}},
+    axisTick:{show:false},splitLine:{length:10,lineStyle:{color:'#3a5a7e'}},
+    axisLabel:{color:'#5a7a9e',fontSize:9,distance:-20},
+    pointer:{itemStyle:{color:'#409eff'}},
+    detail:{valueAnimation:true,formatter:'{value}%',color:'#e5edf7',fontSize:26,fontWeight:'bold',offsetCenter:[0,'30%']},
+    title:{color:'#5a7a9e',fontSize:11,offsetCenter:[0,'60%']},
+    data:[{value:87.3,name:'产能利用率'}]}]
+})
+
+// Erlang C
+function erlangC(s,rho){if(s<=rho)return 1;let sum=0;for(let k=0;k<s;k++)sum+=Math.pow(rho,k)/fact(k);const n=Math.pow(rho,s)/fact(s);return n/(n+sum*(1-rho/s))}
+function fact(n){let r=1;for(let i=2;i<=n;i++)r*=i;return r}
+function calc(arr,aht,interval,asa,shrink,sla){
+  const ar=arr/(interval*60),sr=1/aht,rho=ar/sr
+  let s=Math.ceil(rho)+1,sl=0
+  while(s<5000){sl=1-erlangC(s,rho)*Math.exp(-(s-rho)*asa/aht);if(sl>=sla/100)break;s++}
+  return {raw:s,pos:Math.ceil(s/(1-shrink/100)),sl:Math.round(sl*1000)/10,occ:Math.round(Math.min(rho/s*100,99.9)*10)/10}
+}
+function updDemand(){
+  const arr=+document.getElementById('arr').value
+  const aht=+document.getElementById('aht').value
+  document.getElementById('arr-v').textContent=arr
+  document.getElementById('aht-v').textContent=aht+'s'
+  const sc=[{n:'淡季',m:.5},{n:'平季',m:1},{n:'旺季',m:1.8},{n:'促销',m:2.5}]
+  const res=sc.map(s=>({...s,...calc(Math.round(arr*s.m),aht,30,20,30,85)}))
+  echarts.init(document.getElementById('chart-demand')).setOption({...DC,
+    xAxis:{type:'category',data:res.map(r=>r.n),...AX},
+    yAxis:{type:'value',name:'人数',nameTextStyle:{color:'#5a7a9e',fontSize:10},...AX},
+    series:[{type:'bar',data:res.map(r=>r.pos),barWidth:40,
+      itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#34d399'},{offset:1,color:'#0e7a5c'}]),borderRadius:[6,6,0,0]},
+      label:{show:true,position:'top',color:'#e5edf7',fontSize:13,fontWeight:'bold'}}]
+  })
+  document.getElementById('demand-insight').innerHTML=`平季需 <b style="color:#34d399">${res[1].pos}</b> 人/班组，服务水平 <b style="color:#34d399">${res[1].sl}%</b>，上座率 <b style="color:#409eff">${res[1].occ}%</b>。AI动态调整可减少 <b style="color:#34d399">~14%</b> 超员成本，年省约 <b style="color:#34d399">${Math.round(res[1].pos*0.14*17.4)}</b> 万。`
+}
+document.getElementById('arr').addEventListener('input',updDemand)
+document.getElementById('aht').addEventListener('input',updDemand)
+updDemand()
+
+// SHAP因素
+echarts.init(document.getElementById('chart-shap')).setOption({...DC,
+  grid:{left:'25%',right:'8%',top:'5%',bottom:'8%'},
+  xAxis:{type:'value',name:'影响权重(%)',nameTextStyle:{color:'#5a7a9e',fontSize:10},...AX},
+  yAxis:{type:'category',data:['距上次晋升','加班时长','月收入','工作满意度','总工作年限','在司年限','通勤距离','日薪水平'].reverse(),...AX,axisLabel:{color:'#a0b8e0',fontSize:11}},
+  series:[{type:'bar',data:[4.8,4.9,5.3,5.4,7.3,9.2,11.9,12.5].reverse(),barWidth:14,
+    itemStyle:{color:new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:'#409eff'},{offset:1,color:'#34d399'}]),borderRadius:[0,4,4,0]},
+    label:{show:true,position:'right',color:'#a0b8e0',fontSize:10,formatter:'{c}%'}}]
+})
+
+// 离职预警
+const alerts=[
+  {name:'张伟',dept:'销售部',score:92,reason:'连续3月加班超80h',ico:'⚠️'},
+  {name:'王芳',dept:'装配车间',score:88,reason:'收入低于同岗15%',ico:'⚠️'},
+  {name:'李强',dept:'仓储物流',score:85,reason:'满意度评分2.1/5',ico:'⚠️'},
+  {name:'陈静',dept:'冲压车间',score:76,reason:'通勤45km+频繁请假',ico:'⚡'},
+  {name:'刘洋',dept:'焊接车间',score:65,reason:'近1年无晋升',ico:'⚡'},
+  {name:'赵磊',dept:'技术研发',score:42,reason:'状态稳定',ico:'✓'},
+]
+document.getElementById('alert-list').innerHTML=alerts.map(a=>`<div class="alert-item ${a.score>=80?'':a.score>=60?'warn':'ok'}"><span class="alert-ico">${a.ico}</span><div class="alert-txt"><b>${a.name}</b> · ${a.dept}<br>${a.reason}</div><div class="alert-score" style="color:${a.score>=80?'#f87171':a.score>=60?'#fbbf24':'#34d399'}">${a.score}</div></div>`).join('')
 </script>
-
 </body>
 </html>
