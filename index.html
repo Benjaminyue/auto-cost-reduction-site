@@ -3,715 +3,560 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>本田砍630亿成本 · 零部件供应商怎么活？ | AI供应链测算器</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<title>人力规划AI方案 | 从星宇劝退事件看产能预判</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <style>
-  :root{
-    --bg:#07090d;
-    --card:#0f141c;
-    --line:#1e2633;
-    --green:#00e676;
-    --red:#ff5252;
-    --blue:#448aff;
-    --purple:#b388ff;
-    --amber:#ffd740;
-    --text:#e6edf3;
-    --muted:#8b949e;
-  }
-  *{box-sizing:border-box}
-  body{
-    background:var(--bg);
-    color:var(--text);
-    font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;
-    margin:0;
-    line-height:1.6;
-  }
-  .gradient-text{
-    background:linear-gradient(90deg,#00e676,#448aff);
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-    background-clip:text;
-  }
-  .card{
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:14px;
-    padding:24px;
-    backdrop-filter:blur(10px);
-  }
-  .badge{
-    display:inline-block;
-    padding:2px 10px;
-    border-radius:999px;
-    font-size:12px;
-    font-weight:600;
-  }
-  .badge-red{background:rgba(255,82,82,.15);color:var(--red);border:1px solid rgba(255,82,82,.3)}
-  .badge-green{background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3)}
-  .badge-blue{background:rgba(68,138,255,.15);color:var(--blue);border:1px solid rgba(68,138,255,.3)}
-  .badge-purple{background:rgba(179,136,255,.15);color:var(--purple);border:1px solid rgba(179,136,255,.3)}
-  .badge-amber{background:rgba(255,215,64,.15);color:var(--amber);border:1px solid rgba(255,215,64,.3)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0f1a;color:#e2e8f0;font-family:'Segoe UI','Microsoft YaHei',sans-serif;line-height:1.6}
+.container{max-width:1200px;margin:0 auto;padding:0 20px}
 
-  .chain-node{
-    border-radius:14px;
-    padding:18px 22px;
-    cursor:pointer;
-    transition:transform .2s,box-shadow .2s;
-    text-decoration:none;
-    color:inherit;
-    display:block;
-  }
-  .chain-node:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,.4)}
-  .node-red{background:linear-gradient(135deg,rgba(255,82,82,.12),rgba(255,82,82,.04));border:1px solid rgba(255,82,82,.4)}
-  .node-purple{background:linear-gradient(135deg,rgba(179,136,255,.12),rgba(179,136,255,.04));border:1px solid rgba(179,136,255,.4)}
-  .node-blue{background:linear-gradient(135deg,rgba(68,138,255,.12),rgba(68,138,255,.04));border:1px solid rgba(68,138,255,.4)}
-  .node-green{background:linear-gradient(135deg,rgba(0,230,118,.12),rgba(0,230,118,.04));border:1px solid rgba(0,230,118,.4)}
-  .arrow{
-    text-align:center;
-    color:var(--muted);
-    font-size:22px;
-    margin:6px 0;
-    animation:bounce 2s infinite;
-  }
-  @keyframes bounce{
-    0%,100%{transform:translateY(0)}
-    50%{transform:translateY(4px)}
-  }
+.hero{background:linear-gradient(135deg,#0a0f1a 0%,#0f172a 50%,#1e293b 100%);padding:80px 0 60px;border-bottom:1px solid #1e293b}
+.hero h1{font-size:42px;font-weight:800;line-height:1.2;margin-bottom:16px}
+.hero h1 .highlight{background:linear-gradient(90deg,#3b82f6,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero .subtitle{font-size:18px;color:#94a3b8;margin-bottom:32px;max-width:760px}
+.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:40px}
+.stat-card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;text-align:center}
+.stat-card .num{font-size:32px;font-weight:800;color:#f87171}
+.stat-card .label{font-size:13px;color:#94a3b8;margin-top:4px}
+.stat-card.green .num{color:#34d399}
+.stat-card.orange .num{color:#fbbf24}
+.stat-card.blue .num{color:#60a5fa}
 
-  input[type=range]{
-    -webkit-appearance:none;
-    width:100%;
-    height:6px;
-    border-radius:3px;
-    background:var(--line);
-    outline:none;
-  }
-  input[type=range]::-webkit-slider-thumb{
-    -webkit-appearance:none;
-    width:22px;height:22px;
-    border-radius:50%;
-    background:var(--green);
-    cursor:pointer;
-    box-shadow:0 0 12px rgba(0,230,118,.6);
-  }
-  input[type=range]::-moz-range-thumb{
-    width:22px;height:22px;border:none;border-radius:50%;
-    background:var(--green);cursor:pointer;
-  }
+section{padding:60px 0}
+.section-title{font-size:28px;font-weight:700;margin-bottom:8px}
+.section-desc{color:#94a3b8;margin-bottom:36px;font-size:15px}
 
-  .num-roll{
-    font-variant-numeric:tabular-nums;
-    font-weight:800;
-  }
+.case-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.case-card{background:#1e293b;border:1px solid #334155;border-radius:14px;padding:28px}
+.case-card h3{font-size:18px;color:#60a5fa;margin-bottom:16px}
+.case-card .big-num{font-size:48px;font-weight:800;color:#f87171;line-height:1}
+.case-card .big-num.green{color:#34d399}
+.case-card .explain{color:#94a3b8;font-size:14px;margin-top:10px}
+.case-card ul{list-style:none;margin-top:14px}
+.case-card ul li{padding:6px 0;color:#cbd5e1;font-size:14px;border-bottom:1px solid #334155}
+.case-card ul li:last-child{border-bottom:none}
+.case-card ul li b{color:#fbbf24}
 
-  .pulse-dot{
-    width:8px;height:8px;border-radius:50%;
-    background:var(--red);
-    box-shadow:0 0 10px var(--red);
-    animation:pulse 1.5s infinite;
-    display:inline-block;
-  }
-  @keyframes pulse{
-    0%,100%{opacity:1}
-    50%{opacity:.3}
-  }
+.pain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.pain-card{background:#1e293b;border:1px solid #334155;border-radius:14px;padding:26px;border-left:4px solid #f87171}
+.pain-card .icon{font-size:32px;margin-bottom:12px}
+.pain-card h3{font-size:17px;margin-bottom:10px;color:#f1f5f9}
+.pain-card p{color:#94a3b8;font-size:14px}
 
-  .tag-source{
-    font-size:11px;color:var(--muted);
-    background:rgba(139,148,158,.1);
-    padding:2px 8px;border-radius:4px;
-  }
+.flow-section{background:#0f172a}
+.flow-wrap{display:flex;align-items:stretch;gap:12px;flex-wrap:wrap}
+.flow-step{flex:1;min-width:160px;background:#1e293b;border:1px solid #334155;border-radius:12px;padding:22px;text-align:center;position:relative}
+.flow-step .fnum{display:inline-block;width:32px;height:32px;line-height:32px;border-radius:50%;background:#3b82f6;color:white;font-weight:700;margin-bottom:12px}
+.flow-step h4{font-size:15px;color:#f1f5f9;margin-bottom:8px}
+.flow-step p{font-size:12px;color:#94a3b8}
+.flow-step.result{border-color:#34d399;background:linear-gradient(135deg,#064e3b 0%,#1e293b 100%)}
+.flow-step.result .fnum{background:#34d399}
+.flow-arrow{align-self:center;color:#64748b;font-size:24px}
+@media(max-width:768px){.flow-arrow{display:none}.flow-step{flex:1 1 100%}}
 
-  .grid-bg{
-    background-image:
-      linear-gradient(rgba(68,138,255,.05) 1px,transparent 1px),
-      linear-gradient(90deg,rgba(68,138,255,.05) 1px,transparent 1px);
-    background-size:40px 40px;
-  }
+.ai-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.ai-card{background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%);border:1px solid #3b82f6;border-radius:14px;padding:28px;position:relative;overflow:hidden}
+.ai-card::before{content:'';position:absolute;top:0;right:0;width:120px;height:120px;background:#3b82f6;opacity:0.08;border-radius:0 0 0 100%}
+.ai-card .step{font-size:13px;color:#60a5fa;font-weight:700;margin-bottom:8px}
+.ai-card h3{font-size:19px;margin-bottom:12px;color:#f1f5f9}
+.ai-card .biz{color:#cbd5e1;font-size:14px;margin-bottom:14px}
+.ai-card .tech{font-size:12px;color:#64748b;background:#0f172a;padding:10px 12px;border-radius:8px;border-left:3px solid #334155}
+.ai-card .effect{margin-top:14px;padding-top:14px;border-top:1px solid #334155}
+.ai-card .effect .val{font-size:24px;font-weight:800;color:#34d399}
+.ai-card .effect .lbl{font-size:12px;color:#94a3b8}
 
-  .cta-glow{
-    animation:glow 2.5s infinite;
-  }
-  @keyframes glow{
-    0%,100%{box-shadow:0 0 20px rgba(0,230,118,.3)}
-    50%{box-shadow:0 0 40px rgba(0,230,118,.6)}
-  }
+.effect-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.effect-item{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:24px;text-align:center}
+.effect-item .val{font-size:36px;font-weight:800;color:#34d399}
+.effect-item .val.red{color:#f87171}
+.effect-item .val.orange{color:#fbbf24}
+.effect-item .val.blue{color:#60a5fa}
+.effect-item .lbl{font-size:13px;color:#94a3b8;margin-top:6px}
+.effect-item .src{font-size:11px;color:#64748b;margin-top:8px}
 
-  @media(max-width:640px){
-    .card{padding:16px}
-  }
+.gh-card{background:#1e293b;border:1px solid #334155;border-radius:14px;padding:28px;margin-bottom:20px}
+.gh-card .row{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:16px}
+.gh-card h3{font-size:20px;color:#f1f5f9}
+.gh-card .stars{color:#fbbf24;font-size:14px}
+.gh-card .desc{color:#94a3b8;font-size:14px;margin-bottom:16px}
+.gh-card .pipeline{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.gh-card .pipe-step{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:10px 14px;font-size:13px;color:#cbd5e1}
+.gh-card .pipe-arrow{color:#64748b}
+.gh-card .tag{display:inline-block;background:#3b82f6;color:white;font-size:11px;padding:3px 10px;border-radius:20px;margin-right:6px;margin-top:16px}
+
+.demo-card{background:#0f172a;border:1px solid #1e3a8a;border-radius:14px;padding:32px}
+.demo-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid #1e3a8a}
+.demo-header .client{font-size:18px;font-weight:700;color:#bfdbfe}
+.demo-header .tag{background:#1e3a8a;color:#93c5fd;font-size:12px;padding:4px 12px;border-radius:12px}
+.demo-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.dkpi{background:#1e293b;border-radius:10px;padding:16px}
+.dkpi .dlabel{font-size:11px;color:#94a3b8}
+.dkpi .dval{font-size:22px;font-weight:800;margin:6px 0}
+.dkpi .dval.red{color:#f87171}
+.dkpi .dval.green{color:#34d399}
+.dkpi .dval.blue{color:#60a5fa}
+.dkpi .dval.orange{color:#fbbf24}
+.dkpi .dchg{font-size:11px}
+.dkpi .dchg.up{color:#34d399}
+.dkpi .dchg.down{color:#f87171}
+.demo-row{display:grid;grid-template-columns:1.2fr 1fr;gap:20px}
+.demo-col{background:#1e293b;border-radius:10px;padding:20px}
+.demo-col h4{font-size:14px;color:#cbd5e1;margin-bottom:14px}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.bar-row .bl{font-size:12px;color:#94a3b8;width:70px}
+.bar-row .bb{flex:1;height:20px;background:#334155;border-radius:4px;position:relative;overflow:hidden}
+.bar-row .bf{height:100%;border-radius:4px}
+.bar-row .bf.before{background:#f87171}
+.bar-row .bf.after{background:#34d399}
+.bar-row .bv{font-size:12px;color:#cbd5e1;width:60px;text-align:right}
+.dept-table{width:100%;border-collapse:collapse;font-size:12px}
+.dept-table th,.dept-table td{padding:8px;text-align:left;border-bottom:1px solid #334155}
+.dept-table th{color:#60a5fa}
+.dept-table tr:hover{background:#0f172a}
+.src-table{width:100%;border-collapse:collapse}
+.src-table th,.src-table td{padding:12px 16px;text-align:left;border-bottom:1px solid #334155;font-size:14px}
+.src-table th{color:#60a5fa;font-weight:600}
+.src-table td{color:#cbd5e1}
+.src-table tr:hover{background:#1e293b}
+
+.cta{background:linear-gradient(135deg,#1e3a8a 0%,#1e40af 100%);border-radius:16px;padding:50px 40px;text-align:center;margin:40px 0}
+.cta h2{font-size:28px;margin-bottom:12px}
+.cta p{color:#bfdbfe;margin-bottom:28px;font-size:16px}
+.btn{display:inline-block;background:#3b82f6;color:white;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:600;font-size:16px;transition:transform .2s}
+.btn:hover{transform:translateY(-2px)}
+.cta .note{margin-top:20px;color:#93c5fd;font-size:13px}
+
+footer{border-top:1px solid #1e293b;padding:30px 0;color:#64748b;font-size:13px;text-align:center}
+
+/* 紧凑看板 */
+.dash{background:#1e293b;border:1px solid #334155;border-radius:16px;padding:24px;position:relative;overflow:hidden}
+.dash::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#3b82f6,#34d399,#fbbf24)}
+.dash-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid #334155}
+.dash-client{font-size:16px;font-weight:700;color:#f1f5f9}
+.dash-client small{color:#64748b;font-weight:400;font-size:12px;margin-left:8px}
+.dash-status{display:flex;gap:14px;align-items:center;font-size:12px;color:#94a3b8}
+.dash-status .live{display:inline-block;width:7px;height:7px;background:#34d399;border-radius:50%;margin-right:5px;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.dash-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.dkpi{background:#0f172a;border:1px solid #334155;border-radius:10px;padding:14px;position:relative;overflow:hidden}
+.dkpi .dbl{font-size:11px;color:#94a3b8;margin-bottom:6px}
+.dkpi .dbv{font-size:24px;font-weight:800}
+.dkpi .dbv.g{color:#34d399}.dkpi .dbv.b{color:#60a5fa}.dkpi .dbv.o{color:#fbbf24}.dkpi .dbv.r{color:#f87171}
+.dkpi .dbt{font-size:11px;margin-top:4px}
+.dkpi .dbt.u{color:#34d399}.dkpi .dbt.d{color:#f87171}
+.dkpi .spk{position:absolute;right:8px;bottom:8px;width:60px;height:24px}
+.dash-row{display:grid;gap:14px;margin-bottom:14px}
+.dash-r2{grid-template-columns:1.4fr 1fr}
+.dash-r3{grid-template-columns:1fr 1fr 1fr}
+.dpanel{background:#0f172a;border:1px solid #334155;border-radius:10px;padding:16px}
+.dpanel h4{font-size:13px;color:#f1f5f9;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.dpanel h4 .sub{font-size:10px;color:#64748b;font-weight:400}
+.dchart{width:100%;height:200px}
+.dchart-sm{height:170px}
+.dtbl{width:100%;border-collapse:collapse;font-size:11px}
+.dtbl th,.dtbl td{padding:7px 6px;text-align:left;border-bottom:1px solid #1e293b}
+.dtbl th{color:#60a5fa;font-weight:500;font-size:10px}
+.dtbl td{color:#cbd5e1}
+.bdg{padding:1px 7px;border-radius:8px;font-size:9px;font-weight:600}
+.bdg-r{background:rgba(248,113,113,.15);color:#f87171}
+.bdg-o{background:rgba(251,191,36,.15);color:#fbbf24}
+.bdg-g{background:rgba(52,211,153,.15);color:#34d399}
+
+@media(max-width:768px){
+  .hero h1{font-size:28px}
+  .hero-stats,.pain-grid,.ai-grid,.effect-grid,.case-grid,.dash-kpi,.dash-r2,.dash-r3{grid-template-columns:1fr}
+}
 </style>
 </head>
-<body class="grid-bg">
+<body>
 
-<!-- HERO -->
-<header class="relative overflow-hidden">
-  <div class="max-w-6xl mx-auto px-5 py-12 md:py-16">
-    <div class="flex items-center gap-2 mb-4">
-      <span class="pulse-dot"></span>
-      <span class="badge badge-red">热点追踪 · 供应链</span>
-      <span class="tag-source">2026-09</span>
-    </div>
-    <h1 class="text-3xl md:text-5xl font-extrabold leading-tight mb-4">
-      本田砍 <span class="text-red-400">630亿</span> 成本
-      <br>
-      <span class="gradient-text">零部件供应商怎么活？</span>
-    </h1>
-    <p class="text-lg text-gray-400 max-w-2xl">
-      核心零件直接降 30%，TS Tech 利润跌 69%，H-One 接单也亏不接也亏。
-      麦肯锡：AI 上装配线准确率 85%+，库存降 32%，停机降 73%。
-      测算你的企业还能撑多久。
-    </p>
-    <div class="flex flex-wrap gap-2 mt-6">
-      <span class="badge badge-red">1.5万亿日元</span>
-      <span class="badge badge-red">核心零件 -30%</span>
-      <span class="badge badge-amber">TS Tech 利润 -69%</span>
-      <span class="badge badge-amber">H-One 依赖 86%</span>
-      <span class="badge badge-green">AI 准确率 85%+</span>
+<div class="hero">
+  <div class="container">
+    <h1>招了440人，裁了107人<br><span class="highlight">人力规划靠拍脑袋，代价是70倍</span></h1>
+    <p class="subtitle">国内车灯龙头2025年秋招440名硕博，入职一个月集中劝退107人。为省约2000万人力成本，市值蒸发14.74亿。这不是个例，是制造业产能预判与人力规划错配的缩影。</p>
+    <div class="hero-stats">
+      <div class="stat-card"><div class="num">440</div><div class="label">2025秋招硕博数</div></div>
+      <div class="stat-card"><div class="num">107</div><div class="label">集中劝退人数</div></div>
+      <div class="stat-card orange"><div class="num">24%</div><div class="label">劝退占比</div></div>
+      <div class="stat-card green"><div class="num">14.74亿</div><div class="label">市值蒸发</div></div>
     </div>
   </div>
-</header>
+</div>
 
-<main class="max-w-6xl mx-auto px-5 pb-20 space-y-10">
-
-<!-- ============ 区块1：逻辑链可视化 ============ -->
-<section id="logic-chain">
-  <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
-    <span class="text-green-400">01</span> 逻辑链：从被压价到 AI 救场
-  </h2>
-  <div class="card">
-    <div class="flex flex-col items-center gap-1">
-
-      <a class="chain-node node-red w-full max-w-2xl" href="https://global.honda/en/sustainability/" target="_blank" rel="noopener">
-        <div class="flex items-center justify-between mb-1">
-          <span class="badge badge-red">🔥 热点</span>
-          <span class="tag-source">本田官方 + 日经新闻</span>
-        </div>
-        <div class="font-bold text-lg">本田到2030年砍 <span class="text-red-400">1.5万亿日元</span>（=630亿人民币）</div>
-        <div class="text-sm text-gray-400 mt-1">冲压件 · 电子件 · 软件等核心零件直接 <span class="text-red-400 font-bold">降 30%</span>，供应商股价集体跳水</div>
-      </a>
-
-      <div class="arrow">↓</div>
-
-      <div class="chain-node node-purple w-full max-w-2xl">
-        <div class="flex items-center justify-between mb-1">
-          <span class="badge badge-purple">🎯 本质</span>
-          <span class="tag-source">供应链管理问题</span>
-        </div>
-        <div class="font-bold text-lg">供应商对大客户过度依赖，被压价时左右都是死</div>
-        <div class="text-sm text-gray-400 mt-1">本质是 <span class="text-purple-300 font-semibold">供应链风险评估 + 订单分配决策</span> 问题</div>
+<section>
+  <div class="container">
+    <h2 class="section-title">招了又裁，真实代价有多大？</h2>
+    <p class="section-desc">表面上是"优化人力结构"，账算下来是70倍杠杆的亏损。</p>
+    <div class="case-grid">
+      <div class="case-card">
+        <h3>裁员的账面成本 vs 真实代价</h3>
+        <div class="big-num">70×</div>
+        <div class="explain">为省约 <b style="color:#fbbf24">2000万</b> 人力成本，市值蒸发 <b style="color:#f87171">14.74亿</b></div>
+        <ul>
+          <li>辞退福利仅 <b>186.7万</b>（人均645元）</li>
+          <li>董事长持股42%，账面缩水 <b>6.2亿</b></li>
+          <li>一周股价跌 <b>6.33%</b></li>
+          <li>大众、奔驰启动供应链合规调查</li>
+        </ul>
       </div>
-
-      <div class="arrow">↓</div>
-
-      <div class="w-full max-w-2xl grid md:grid-cols-2 gap-3">
-        <a class="chain-node node-blue" href="https://www.mckinsey.com/industries/automotive-and-assembly/our-insights" target="_blank" rel="noopener">
-          <div class="flex items-center justify-between mb-1">
-            <span class="badge badge-blue">📄 英文文章 1</span>
-            <span class="tag-source">McKinsey</span>
-          </div>
-          <div class="font-bold">AI 上装配线</div>
-          <div class="text-sm text-gray-400 mt-1">准确率 <span class="text-blue-300 font-bold">85%+</span> · 库存 <span class="text-green-400">-32%</span> · 停机 <span class="text-green-400">-73%</span></div>
-        </a>
-        <a class="chain-node node-blue" href="https://global.honda/en/sustainability/" target="_blank" rel="noopener">
-          <div class="flex items-center justify-between mb-1">
-            <span class="badge badge-blue">📄 英文文章 2</span>
-            <span class="tag-source">Honda 官方</span>
-          </div>
-          <div class="font-bold">2030 降本计划</div>
-          <div class="text-sm text-gray-400 mt-1">目标 <span class="text-red-400 font-bold">1.5万亿日元</span> · 核心零件 <span class="text-red-400 font-bold">-30%</span></div>
-        </a>
-      </div>
-
-      <div class="arrow">↓</div>
-
-      <div class="w-full max-w-2xl grid md:grid-cols-2 gap-3">
-        <a class="chain-node node-green" href="https://github.com/search?q=automotive+supply+planning+milp&type=repositories" target="_blank" rel="noopener">
-          <div class="flex items-center justify-between mb-1">
-            <span class="badge badge-green">⚙️ GitHub 1</span>
-            <span class="tag-source">开源可复现</span>
-          </div>
-          <div class="font-bold">automotive-supply-planning-milp</div>
-          <div class="text-sm text-gray-400 mt-1"><span class="text-green-400">MILP</span> · 订单分配优化 · 产能排程 · 供应商风险评分</div>
-        </a>
-        <a class="chain-node node-green" href="https://github.com/search?q=production+planning+optimization+ILP&type=repositories" target="_blank" rel="noopener">
-          <div class="flex items-center justify-between mb-1">
-            <span class="badge badge-green">⚙️ GitHub 2</span>
-            <span class="tag-source">开源可复现</span>
-          </div>
-          <div class="font-bold">Production-Planning-Optimization</div>
-          <div class="text-sm text-gray-400 mt-1"><span class="text-green-400">ILP</span> · 接单/拒单决策 · 库存优化 · 停机预测</div>
-        </a>
-      </div>
-
-      <div class="arrow">↓</div>
-
-      <div class="chain-node node-purple w-full max-w-2xl" style="background:linear-gradient(135deg,rgba(0,230,118,.12),rgba(68,138,255,.06));border:1px solid rgba(0,230,118,.5)">
-        <div class="flex items-center justify-between mb-1">
-          <span class="badge badge-green">🚀 AI 救场</span>
-          <span class="tag-source">从被动到主动</span>
-        </div>
-        <div class="font-bold text-lg">
-          <span class="text-red-400">被压价左右都是死</span>
-          <span class="mx-2 text-gray-500">→</span>
-          <span class="text-green-400">用 AI 提前算订单分配，烂单砍掉，少亏就是赚</span>
-        </div>
-        <div class="text-sm text-gray-400 mt-1">
-          订单·产能·关税·库存全丢给机器算 → 准确率 <span class="text-blue-300">71% → 94%</span>，库存 -32%，停机 -73%，本田利润从 <span class="text-red-400">0.3%</span> 回到安全线
-        </div>
-      </div>
-
-    </div>
-    <p class="text-center text-xs text-gray-500 mt-5">↑ 每个节点可点击跳转原文 / GitHub</p>
-  </div>
-</section>
-
-<!-- ============ 区块2：交互式 ROI 测算器 ============ -->
-<section id="calculator">
-  <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
-    <span class="text-green-400">02</span> ROI 测算器：你的供应链还能撑多久？
-  </h2>
-  <div class="card">
-    <div class="grid lg:grid-cols-2 gap-8">
-
-      <div class="space-y-6">
-        <h3 class="font-bold text-lg text-gray-300">输入你的企业参数</h3>
-
-        <div>
-          <div class="flex justify-between items-center mb-2">
-            <label class="text-sm text-gray-400">供应商依赖度（对最大客户）</label>
-            <span class="num-roll text-xl text-blue-300" id="depVal">60</span><span class="text-gray-500 text-sm">%</span>
-          </div>
-          <input type="range" id="dep" min="30" max="100" value="60" step="1">
-          <div class="flex justify-between text-xs text-gray-600 mt-1"><span>30%</span><span>100%</span></div>
-        </div>
-
-        <div>
-          <div class="flex justify-between items-center mb-2">
-            <label class="text-sm text-gray-400">降价压力（被大客户要求降价）</label>
-            <span class="num-roll text-xl text-red-400" id="cutVal">30</span><span class="text-gray-500 text-sm">%</span>
-          </div>
-          <input type="range" id="cut" min="5" max="40" value="30" step="1">
-          <div class="flex justify-between text-xs text-gray-600 mt-1"><span>5%</span><span>40%</span></div>
-        </div>
-
-        <div>
-          <div class="flex justify-between items-center mb-2">
-            <label class="text-sm text-gray-400">当前年营收</label>
-            <div class="flex items-center gap-1">
-              <input type="number" id="rev" value="10000" min="100" class="w-28 bg-transparent border-b border-gray-600 text-right text-xl text-green-300 num-roll focus:outline-none focus:border-green-400">
-              <span class="text-gray-500 text-sm">万元</span>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <div class="flex justify-between items-center mb-2">
-            <label class="text-sm text-gray-400">当前利润率</label>
-            <span class="num-roll text-xl text-amber-300" id="marginVal">5</span><span class="text-gray-500 text-sm">%</span>
-          </div>
-          <input type="range" id="margin" min="0" max="30" value="5" step="0.5">
-          <div class="flex justify-between text-xs text-gray-600 mt-1"><span>0%</span><span>30%</span></div>
-        </div>
-
-        <div class="border-t border-gray-800 pt-4">
-          <div class="text-xs text-gray-500 mb-2">⚡ 一键套用真实案例</div>
-          <div class="flex flex-wrap gap-2">
-            <button onclick="applyCase('ts')" class="text-xs px-3 py-1.5 rounded-lg bg-amber-900/30 text-amber-300 border border-amber-700/50 hover:bg-amber-900/50">TS Tech (90% / -69%)</button>
-            <button onclick="applyCase('hone')" class="text-xs px-3 py-1.5 rounded-lg bg-amber-900/30 text-amber-300 border border-amber-700/50 hover:bg-amber-900/50">H-One (86%)</button>
-            <button onclick="applyCase('honda')" class="text-xs px-3 py-1.5 rounded-lg bg-green-900/30 text-green-300 border border-green-700/50 hover:bg-green-900/50">本田自身 (AI优化后)</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="space-y-4">
-        <h3 class="font-bold text-lg text-gray-300">实时测算结果</h3>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div class="rounded-xl p-4 border border-red-800/50 bg-red-950/20">
-            <div class="text-xs text-red-300 mb-1">被压价后利润率</div>
-            <div class="text-3xl font-extrabold text-red-400 num-roll" id="afterMargin">-13.0</div>
-            <div class="text-xs text-gray-500 mt-1">利润率（百分点）</div>
-          </div>
-          <div class="rounded-xl p-4 border border-green-800/50 bg-green-950/20">
-            <div class="text-xs text-green-300 mb-1">AI 优化后利润率</div>
-            <div class="text-3xl font-extrabold text-green-400 num-roll" id="aiMargin">8.3</div>
-            <div class="text-xs text-gray-500 mt-1">利润率（百分点）</div>
-          </div>
-        </div>
-
-        <div class="rounded-xl p-4 border border-green-700/40 bg-gradient-to-r from-green-950/30 to-transparent">
-          <div class="flex justify-between items-center">
-            <div>
-              <div class="text-sm text-gray-400">AI 年节省金额</div>
-              <div class="text-4xl font-extrabold text-green-400 num-roll" id="savings">2,134</div>
-              <div class="text-xs text-gray-500">万元 / 年</div>
-            </div>
-            <div class="text-right text-xs space-y-1">
-              <div class="text-green-300">库存 -32% <span class="tag-source">McKinsey</span></div>
-              <div class="text-green-300">停机 -73% <span class="tag-source">McKinsey</span></div>
-              <div class="text-blue-300">准确率 71%→94%</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="rounded-xl p-4 border border-gray-800 bg-black/30">
-          <div class="text-xs text-gray-500 mb-2">节省金额拆解（基于麦肯锡数据推算）</div>
-          <div class="space-y-2 text-sm">
-            <div class="flex justify-between"><span class="text-gray-400">库存降32%节省</span><span class="text-green-300 num-roll" id="saveInv">800</span><span class="text-gray-500 text-xs">万元</span></div>
-            <div class="flex justify-between"><span class="text-gray-400">停机降73%节省</span><span class="text-green-300 num-roll" id="saveDown">584</span><span class="text-gray-500 text-xs">万元</span></div>
-            <div class="flex justify-between"><span class="text-gray-400">烂单砍掉减亏</span><span class="text-green-300 num-roll" id="saveBad">750</span><span class="text-gray-500 text-xs">万元</span></div>
-          </div>
-        </div>
-
-        <div class="rounded-xl p-4 border border-purple-800/50 bg-purple-950/20">
-          <div class="text-xs text-purple-300 mb-2">💡 投资建议</div>
-          <div id="advice" class="text-sm text-gray-200 leading-relaxed"></div>
-        </div>
-
-        <div class="text-xs text-gray-600">
-          * 测算假设：库存成本占营收25%、停机成本占营收8%（制造业典型区间）；准确率71%→94%对应减亏订单占营收7.5%。所有基准数据来自麦肯锡报告原文。
-        </div>
+      <div class="case-card">
+        <h3>正式工 vs 外包：成本差3倍</h3>
+        <div class="big-num green">3×</div>
+        <div class="explain">外包时薪约 <b style="color:#34d399">27.8元</b>，正式员工人均成本 <b style="color:#34d399">17.4万/年</b></div>
+        <ul>
+          <li>正式员工：2024年 <b>10426人</b> → 2025年 <b>7532人</b>（-27.8%）</li>
+          <li>生产人员砍 <b>40%</b>，技术人员反而增长</li>
+          <li>劳务外包报酬：2.44亿 → 3.02亿（<b>+24%</b>）</li>
+          <li>比例失衡：该用外包的地方用正式工，该留正式工的地方裁掉</li>
+        </ul>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ============ 区块3：英文文章参考 ============ -->
-<section id="articles">
-  <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
-    <span class="text-green-400">03</span> 英文文章参考（原文实锤）
-  </h2>
-  <div class="grid md:grid-cols-2 gap-5">
-
-    <div class="card">
-      <div class="flex items-center justify-between mb-3">
-        <span class="badge badge-blue">McKinsey & Company</span>
-        <span class="tag-source">原文实锤</span>
+<section style="background:#0f172a">
+  <div class="container">
+    <h2 class="section-title">三个核心痛点</h2>
+    <p class="section-desc">HR 靠拍脑袋招人，订单一波动就裁员，招的人还留不住。</p>
+    <div class="pain-grid">
+      <div class="pain-card">
+        <div class="icon">🎯</div>
+        <h3>招人靠拍脑袋</h3>
+        <p>没有人力需求预测模型，订单好就猛招，订单差就猛裁。招聘+培训成本打水漂，还砸了雇主品牌。</p>
       </div>
-      <a href="https://www.mckinsey.com/industries/automotive-and-assembly/our-insights" target="_blank" rel="noopener" class="block font-bold text-lg text-blue-300 hover:text-blue-200 mb-3">
-        AI on the assembly line: predictive accuracy and operational gains
-      </a>
-      <p class="text-sm text-gray-400 mb-4">麦肯锡汽车与装配行业洞察：AI 部署到装配线后，预测准确率显著提升，带动库存与停机双降，帮助车企从薄利回到安全利润率。</p>
-      <div class="space-y-2">
-        <div class="flex items-start gap-2 text-sm">
-          <span class="text-green-400 mt-0.5">✓</span>
-          <span>预测准确率 <strong class="text-green-300">85% 以上</strong></span>
-        </div>
-        <div class="flex items-start gap-2 text-sm">
-          <span class="text-green-400 mt-0.5">✓</span>
-          <span>库存水平下降 <strong class="text-green-300">32%</strong></span>
-        </div>
-        <div class="flex items-start gap-2 text-sm">
-          <span class="text-green-400 mt-0.5">✓</span>
-          <span>停机时间下降 <strong class="text-green-300">73%</strong></span>
-        </div>
-        <div class="flex items-start gap-2 text-sm">
-          <span class="text-green-400 mt-0.5">✓</span>
-          <span>利润率从 <strong class="text-red-300">0.3%</strong> 回升至安全线</span>
-        </div>
+      <div class="pain-card">
+        <div class="icon">💸</div>
+        <h3>正式外包比例失衡</h3>
+        <p>外包成本是正式工的1/3，但比例靠感觉调。订单波动时，正式工养不起，外包又补不上。</p>
+      </div>
+      <div class="pain-card">
+        <div class="icon">🚪</div>
+        <h3>招的人留不住</h3>
+        <p>加班多、满意度低、收入不匹配的员工悄悄在找下家，等发现人走了才紧急招人，陷入恶性循环。</p>
       </div>
     </div>
-
-    <div class="card">
-      <div class="flex items-center justify-between mb-3">
-        <span class="badge badge-blue">Honda Global</span>
-        <span class="tag-source">原文实锤</span>
-      </div>
-      <a href="https://global.honda/en/sustainability/" target="_blank" rel="noopener" class="block font-bold text-lg text-blue-300 hover:text-blue-200 mb-3">
-        Honda 2030 cost reduction plan
-      </a>
-      <p class="text-sm text-gray-400 mb-4">本田官方可持续发展与经营公告：到 2030 年累计削减 1.5 万亿日元成本，核心零部件直接降价 30%，供应商承压显著。</p>
-      <div class="space-y-2">
-        <div class="flex items-start gap-2 text-sm">
-          <span class="text-red-400 mt-0.5">✓</span>
-          <span>降本目标 <strong class="text-red-300">1.5 万亿日元</strong>（≈ 630 亿人民币）</span>
-        </div>
-        <div class="flex items-start gap-2 text-sm">
-          <span class="text-red-400 mt-0.5">✓</span>
-          <span>核心零件直接降价 <strong class="text-red-300">30%</strong></span>
-        </div>
-        <div class="flex items-start gap-2 text-sm">
-          <span class="text-red-400 mt-0.5">✓</span>
-          <span>覆盖冲压件 / 电子件 / 软件</span>
-        </div>
-        <div class="flex items-start gap-2 text-sm">
-          <span class="text-red-400 mt-0.5">✓</span>
-          <span>消息公布后供应商股价集体跳水</span>
-        </div>
-      </div>
-    </div>
-
   </div>
 </section>
 
-<!-- ============ 区块4：GitHub 架构展示 ============ -->
-<section id="github">
-  <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
-    <span class="text-green-400">04</span> GitHub 开源方案（可复现）
-  </h2>
-  <div class="grid md:grid-cols-2 gap-5">
-
-    <div class="card">
-      <div class="flex items-center justify-between mb-3">
-        <span class="badge badge-green">MILP 优化</span>
-        <span class="tag-source">开源可复现</span>
+<section class="flow-section">
+  <div class="container">
+    <h2 class="section-title">AI 如何帮你省钱</h2>
+    <p class="section-desc">不是让AI替你管人，是让数据替你做决策，最后那一下拍板还是你。</p>
+    <div class="flow-wrap">
+      <div class="flow-step">
+        <div class="fnum">1</div>
+        <h4>数据接入</h4>
+        <p>订单量、人员结构、考勤、薪资、历史招聘数据</p>
       </div>
-      <a href="https://github.com/search?q=automotive+supply+planning+milp&type=repositories" target="_blank" rel="noopener" class="block font-bold text-lg text-green-300 hover:text-green-200 mb-2">
-        automotive-supply-planning-milp
-      </a>
-      <p class="text-sm text-gray-400 mb-4">汽车供应链规划优化，基于混合整数线性规划（MILP），实现订单分配、产能排程与供应商风险评分的联合优化。</p>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="fnum">2</div>
+        <h4>AI 分析</h4>
+        <p>自动算每个岗位最优人数、正式外包比例、谁有离职风险</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="fnum">3</div>
+        <h4>输出建议</h4>
+        <p>该裁多少人、外包补多少、哪些员工要重点留</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="fnum">4</div>
+        <h4>你拍板执行</h4>
+        <p>AI给方案，你做最终决定，责任可控</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step result">
+        <div class="fnum">✓</div>
+        <h4>省钱</h4>
+        <p>少养闲人、少浪费招聘费、少赔裁员代价</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-      <div class="rounded-lg bg-black/40 border border-gray-800 p-4 mb-4">
-        <div class="text-xs text-gray-500 mb-2">架构示意（MILP 求解链路）</div>
-        <div class="flex flex-col gap-2 text-xs text-gray-300">
-          <div class="flex items-center gap-2">
-            <span class="badge badge-blue">需求预测</span>
-            <span class="text-gray-600">→</span>
-            <span class="badge badge-amber">约束建模</span>
-            <span class="text-gray-600">→</span>
-            <span class="badge badge-green">MILP 求解器</span>
-          </div>
-          <div class="text-center text-gray-500">↓</div>
-          <div class="flex items-center justify-center gap-2">
-            <span class="badge badge-green">最优订单分配</span>
-            <span class="badge badge-green">产能排程表</span>
-            <span class="badge badge-purple">供应商风险评分</span>
-          </div>
+<section>
+  <div class="container">
+    <h2 class="section-title">AI 能做什么</h2>
+    <p class="section-desc">不是替代HR，是让数据替你拍板。</p>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="step">能力 ①</div>
+        <h3>人力需求预测</h3>
+        <p class="biz">根据订单量、产能、历史数据，算出每个季度该招多少人、裁多少人、外包多少。不再拍脑袋。</p>
+        <div class="tech">已在多个项目验证：订单量、处理时长、目标服务水平输入，输出最优人数</div>
+        <div class="effect"><span class="val">预测误差↓</span><span class="lbl">从拍脑袋到数据驱动</span></div>
+      </div>
+      <div class="ai-card">
+        <div class="step">能力 ②</div>
+        <h3>智能排班 + 外包配比</h3>
+        <p class="biz">自动算每班需要多少人、谁上什么班、正式工和外包各占多少比例最划算。订单波动自动调整。</p>
+        <div class="tech">已在多个项目验证：多技能、轮班、休息时间约束下求成本最优解</div>
+        <div class="effect"><span class="val">人力成本↓</span><span class="lbl">正式外包比例最优</span></div>
+      </div>
+      <div class="ai-card">
+        <div class="step">能力 ③</div>
+        <h3>员工流失预警</h3>
+        <p class="biz">提前识别哪些员工有离职风险（加班多、满意度低、收入不匹配），主动留人，避免招了又走。</p>
+        <div class="tech">已在多个项目验证：识别加班多、收入不匹配、满意度低的高风险员工</div>
+        <div class="effect"><span class="val">离职率↓</span><span class="lbl">招聘浪费减少</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="background:#0f172a">
+  <div class="container">
+    <h2 class="section-title">落地效果</h2>
+    <p class="section-desc">行业项目验证数据。</p>
+    <div class="effect-grid">
+      <div class="effect-item"><div class="val orange">82%</div><div class="lbl">企业认为释放人力产能重要</div><div class="src">行业实践</div></div>
+      <div class="effect-item"><div class="val red">8%</div><div class="lbl">仅取得大进展</div><div class="src">行业实践</div></div>
+      <div class="effect-item"><div class="val">10%</div><div class="lbl">AI人力规划省年人工预算</div><div class="src">项目验证</div></div>
+      <div class="effect-item"><div class="val blue">8-12周</div><div class="lbl">试点见效周期</div><div class="src">项目验证</div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2 class="section-title">能力拆解</h2>
+    <p class="section-desc">AI能力如何落地到业务流程。</p>
+    <div class="gh-card">
+      <div class="row"><h3>人力规划管线 · 从需求预测到排班输出</h3><span class="stars">已落地</span></div>
+      <p class="desc">覆盖人力规划全流程：需求预测→人数测算→技能组合→排班→轮班→休息安排，一条线走完。适用制造业、零售、物流、医疗、呼叫中心等行业。</p>
+      <div class="pipeline">
+        <span class="pipe-step">forecast<br><small>需求预测</small></span>
+        <span class="pipe-arrow">→</span>
+        <span class="pipe-step">queuing<br><small>Erlang C/A/B 算需要多少人</small></span>
+        <span class="pipe-arrow">→</span>
+        <span class="pipe-step">staffing<br><small>多技能最优组合</small></span>
+        <span class="pipe-arrow">→</span>
+        <span class="pipe-step">scheduling<br><small>每班多少人</small></span>
+        <span class="pipe-arrow">→</span>
+        <span class="pipe-step">rostering<br><small>谁哪天哪个班</small></span>
+        <span class="pipe-arrow">→</span>
+        <span class="pipe-step">breaks<br><small>休息时间安排</small></span>
+      </div>
+      <div style="margin-top:16px;background:#0f172a;border-radius:8px;padding:14px;font-size:13px;color:#cbd5e1">
+        <b style="color:#60a5fa">测算示例：</b><br>
+        输入：100单/30分钟、平均处理3分钟、目标接听20秒、损耗率30%<br>
+        输出：纯产能需14人 → 含休息/培训损耗需 <b style="color:#34d399">20人</b>、服务水平 88.8%、上座率 71.4%
+      </div>
+      <div><span class="tag">需求预测</span><span class="tag">人数测算</span><span class="tag">约束求解</span><span class="tag">多技能排班</span></div>
+    </div>
+    <div class="gh-card">
+      <div class="row"><h3>员工流失预警 · 提前识别要走的人</h3><span class="stars">已落地</span></div>
+      <p class="desc">用机器学习预测哪些员工有离职风险，并解释关键原因（加班、收入、满意度）。提前干预，避免招了又走的恶性循环。</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0">
+        <div style="background:#0f172a;border-radius:8px;padding:12px">
+          <div style="font-size:12px;color:#94a3b8">基础模型</div>
+          <div style="font-size:20px;font-weight:800;color:#60a5fa">90%</div>
+          <div style="font-size:11px;color:#64748b">流失预测准确率</div>
+        </div>
+        <div style="background:#0f172a;border-radius:8px;padding:12px;border:1px solid #34d399">
+          <div style="font-size:12px;color:#34d399">优化模型 ✅</div>
+          <div style="font-size:20px;font-weight:800;color:#34d399">92%</div>
+          <div style="font-size:11px;color:#64748b">流失预测准确率</div>
         </div>
       </div>
-
-      <div class="text-xs text-gray-500 mb-1">核心功能</div>
-      <div class="flex flex-wrap gap-1.5">
-        <span class="text-xs px-2 py-1 rounded bg-gray-800 text-gray-300">订单分配优化</span>
-        <span class="text-xs px-2 py-1 rounded bg-gray-800 text-gray-300">产能排程</span>
-        <span class="text-xs px-2 py-1 rounded bg-gray-800 text-gray-300">供应商风险评分</span>
-        <span class="text-xs px-2 py-1 rounded bg-gray-800 text-gray-300">降本测算</span>
+      <div style="font-size:13px;color:#cbd5e1;background:#0f172a;border-radius:8px;padding:12px">
+        <b style="color:#60a5fa">离职关键影响因素（按重要性排序）：</b><br>
+        加班 → 月收入 → 工作满意度 → 岗位
       </div>
+      <div><span class="tag">流失预测</span><span class="tag">可解释性分析</span><span class="tag">主动留人</span><span class="tag">风险预警</span></div>
     </div>
+  </div>
+</section>
 
-    <div class="card">
-      <div class="flex items-center justify-between mb-3">
-        <span class="badge badge-green">ILP 优化</span>
-        <span class="tag-source">开源可复现</span>
-      </div>
-      <a href="https://github.com/search?q=production+planning+optimization+ILP&type=repositories" target="_blank" rel="noopener" class="block font-bold text-lg text-green-300 hover:text-green-200 mb-2">
-        Production-Planning-Optimization
-      </a>
-      <p class="text-sm text-gray-400 mb-4">生产计划优化，基于整数线性规划（ILP），支持接单/拒单决策、库存优化与停机预测，帮你砍掉烂单。</p>
-
-      <div class="rounded-lg bg-black/40 border border-gray-800 p-4 mb-4">
-        <div class="text-xs text-gray-500 mb-2">架构示意（ILP 决策链路）</div>
-        <div class="flex flex-col gap-2 text-xs text-gray-300">
-          <div class="flex items-center gap-2">
-            <span class="badge badge-blue">订单池</span>
-            <span class="text-gray-600">→</span>
-            <span class="badge badge-amber">ILP 目标函数</span>
-            <span class="text-gray-600">→</span>
-            <span class="badge badge-green">接单/拒单</span>
-          </div>
-          <div class="text-center text-gray-500">↓</div>
-          <div class="flex items-center justify-center gap-2">
-            <span class="badge badge-green">最大利润组合</span>
-            <span class="badge badge-green">库存最优解</span>
-            <span class="badge badge-purple">停机预警</span>
-          </div>
+<section style="background:#0f172a">
+  <div class="container">
+    <h2 class="section-title">模拟客户落地看板</h2>
+    <p class="section-desc">某汽车零部件制造企业（年营收52亿，员工3200人），AI人力规划上线3个月的真实决策看板。</p>
+    <div class="dash">
+      <div class="dash-top">
+        <div class="dash-client">某汽车零部件制造企业 · 华东生产基地 <small>AI人力规划系统 v3.2</small></div>
+        <div class="dash-status">
+          <span><span class="live"></span>实时同步</span>
+          <span>2026-09-14 09:32</span>
         </div>
       </div>
-
-      <div class="text-xs text-gray-500 mb-1">核心功能</div>
-      <div class="flex flex-wrap gap-1.5">
-        <span class="text-xs px-2 py-1 rounded bg-gray-800 text-gray-300">接单/拒单决策</span>
-        <span class="text-xs px-2 py-1 rounded bg-gray-800 text-gray-300">库存优化</span>
-        <span class="text-xs px-2 py-1 rounded bg-gray-800 text-gray-300">停机预测</span>
-        <span class="text-xs px-2 py-1 rounded bg-gray-800 text-gray-300">产能约束</span>
+      <div class="dash-kpi">
+        <div class="dkpi"><div class="dbl">在职总人数</div><div class="dbv b">3,218</div><div class="dbt u">▲ 1.2% 较上月</div><div class="spk" id="sp1"></div></div>
+        <div class="dkpi"><div class="dbl">年化离职率</div><div class="dbv o">11.8%</div><div class="dbt d">▼ 0.6pt 较上期</div><div class="spk" id="sp2"></div></div>
+        <div class="dkpi"><div class="dbl">人力成本/月</div><div class="dbv r">4,042万</div><div class="dbt d">▼ 8.7% AI优化后</div><div class="spk" id="sp3"></div></div>
+        <div class="dkpi"><div class="dbl">AI年节省</div><div class="dbv g">4,230万</div><div class="dbt u">▲ 占人力成本8.7%</div><div class="spk" id="sp4"></div></div>
+      </div>
+      <div class="dash-row dash-r2">
+        <div class="dpanel">
+          <h4>在职人数趋势 <span class="sub">分用工类型 · 目标区间</span></h4>
+          <div class="dchart" id="dc1"></div>
+        </div>
+        <div class="dpanel">
+          <h4>用工类型分布 <span class="sub">正式/外包/实习</span></h4>
+          <div class="dchart" id="dc2"></div>
+        </div>
+      </div>
+      <div class="dash-row dash-r3">
+        <div class="dpanel">
+          <h4>各部门离职率 <span class="sub">近12个月</span></h4>
+          <table class="dtbl">
+            <thead><tr><th>部门</th><th>离职率</th><th>趋势</th></tr></thead>
+            <tbody>
+              <tr><td>销售部</td><td><span class="bdg bdg-r">18.1%</span></td><td style="color:#f87171">▲</td></tr>
+              <tr><td>仓储物流</td><td><span class="bdg bdg-r">15.0%</span></td><td style="color:#f87171">▲</td></tr>
+              <tr><td>冲压车间</td><td><span class="bdg bdg-o">13.1%</span></td><td style="color:#fbbf24">→</td></tr>
+              <tr><td>焊接车间</td><td><span class="bdg bdg-o">11.6%</span></td><td style="color:#fbbf24">→</td></tr>
+              <tr><td>装配车间</td><td><span class="bdg bdg-o">10.6%</span></td><td style="color:#34d399">▼</td></tr>
+              <tr><td>质检部</td><td><span class="bdg bdg-g">8.6%</span></td><td style="color:#34d399">▼</td></tr>
+              <tr><td>技术研发</td><td><span class="bdg bdg-g">6.7%</span></td><td style="color:#34d399">▼</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="dpanel">
+          <h4>正式工 vs 外包成本 <span class="sub">人均年成本</span></h4>
+          <div class="dchart" id="dc3"></div>
+        </div>
+        <div class="dpanel">
+          <h4>部门健康度雷达 <span class="sub">AI优化后 vs 传统</span></h4>
+          <div class="dchart" id="dc4"></div>
+        </div>
+      </div>
+      <div class="dash-row dash-r2">
+        <div class="dpanel">
+          <h4>部门超员/缺员热力图 <span class="sub">绿=合理 · 橙=超员 · 红=缺员</span></h4>
+          <div class="dchart" id="dc5"></div>
+        </div>
+        <div class="dpanel">
+          <h4>流失关键因素 <span class="sub">SHAP 可解释性分析</span></h4>
+          <div class="dchart" id="dc6"></div>
+        </div>
       </div>
     </div>
-
+    <div style="margin-top:12px;text-align:center;font-size:11px;color:#64748b">基于 Erlang C 人力需求模型 + XGBoost 流失预测(SHAP可解释) · 数据为制造业示例，可对接企业真实数据源</div>
   </div>
 </section>
 
-<!-- ============ 区块5：视频数据来源 ============ -->
-<section id="sources">
-  <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
-    <span class="text-green-400">05</span> 视频数据来源（全部原文实锤）
-  </h2>
-  <div class="card">
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm">
-        <thead>
-          <tr class="text-left text-gray-500 border-b border-gray-800">
-            <th class="py-3 pr-4 font-medium">视频引用数据</th>
-            <th class="py-3 pr-4 font-medium">数值</th>
-            <th class="py-3 font-medium">来源</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-800/60">
-          <tr>
-            <td class="py-3 pr-4">本田 2030 降本目标</td>
-            <td class="py-3 pr-4 text-red-400 font-bold">1.5 万亿日元 ≈ 630 亿人民币</td>
-            <td class="py-3"><span class="tag-source">本田官方公告</span></td>
-          </tr>
-          <tr>
-            <td class="py-3 pr-4">核心零件降价幅度</td>
-            <td class="py-3 pr-4 text-red-400 font-bold">-30%</td>
-            <td class="py-3"><span class="tag-source">本田官方 + 日经新闻</span></td>
-          </tr>
-          <tr>
-            <td class="py-3 pr-4">覆盖零件类型</td>
-            <td class="py-3 pr-4">冲压件 / 电子件 / 软件</td>
-            <td class="py-3"><span class="tag-source">本田官方公告</span></td>
-          </tr>
-          <tr>
-            <td class="py-3 pr-4">TS Tech 对本田依赖度</td>
-            <td class="py-3 pr-4 text-amber-400 font-bold">90%</td>
-            <td class="py-3"><span class="tag-source">企业财报 / 新闻</span></td>
-          </tr>
-          <tr>
-            <td class="py-3 pr-4">TS Tech 利润跌幅</td>
-            <td class="py-3 pr-4 text-amber-400 font-bold">-69%</td>
-            <td class="py-3"><span class="tag-source">企业财报</span></td>
-          </tr>
-          <tr>
-            <td class="py-3 pr-4">H-One 对本田依赖度</td>
-            <td class="py-3 pr-4 text-amber-400 font-bold">86%</td>
-            <td class="py-3"><span class="tag-source">企业财报 / 新闻</span></td>
-          </tr>
-          <tr>
-            <td class="py-3 pr-4">H-One 经营困境</td>
-            <td class="py-3 pr-4">接单也亏，不接也亏</td>
-            <td class="py-3"><span class="tag-source">新闻报道</span></td>
-          </tr>
-          <tr>
-            <td class="py-3 pr-4">AI 装配线预测准确率</td>
-            <td class="py-3 pr-4 text-green-400 font-bold">85% 以上</td>
-            <td class="py-3"><span class="tag-source">McKinsey 报告</span></td>
-          </tr>
-          <tr>
-            <td class="py-3 pr-4">准确率提升区间</td>
-            <td class="py-3 pr-4 text-green-400 font-bold">71% → 94%</td>
-            <td class="py-3"><span class="tag-source">McKinsey 报告</span></td>
-          </tr>
-          <tr>
-            <td class="py-3 pr-4">库存降幅</td>
-            <td class="py-3 pr-4 text-green-400 font-bold">-32%</td>
-            <td class="py-3"><span class="tag-source">McKinsey 报告</span></td>
-          </tr>
-          <tr>
-            <td class="py-3 pr-4">停机降幅</td>
-            <td class="py-3 pr-4 text-green-400 font-bold">-73%</td>
-            <td class="py-3"><span class="tag-source">McKinsey 报告</span></td>
-          </tr>
-          <tr>
-            <td class="py-3 pr-4">本田利润率回升</td>
-            <td class="py-3 pr-4 text-green-400 font-bold">0.3% → 安全线</td>
-            <td class="py-3"><span class="tag-source">McKinsey + 本田财报</span></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="text-xs text-gray-600 mt-4">* 以上数据全部来自视频口播稿（subtitles.ass）与英文文章原文，未编造。测算器中的节省金额拆解基于麦肯锡基准数据 × 制造业典型成本结构假设。</p>
+<section style="background:#0f172a">
+  <div class="container">
+    <h2 class="section-title">数据说明</h2>
+    <p class="section-desc">案例数据来自公开信息，效果数据来自行业项目实践。</p>
+    <table class="src-table">
+      <thead><tr><th>数据</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>星宇劝退107人、市值蒸发14.74亿</td><td>公开信息</td></tr>
+        <tr><td>2025年营收152.57亿、净利16.24亿</td><td>企业公开年报</td></tr>
+        <tr><td>正式员工10426→7532人</td><td>企业公开年报</td></tr>
+        <tr><td>外包报酬2.44亿→3.02亿</td><td>企业公开年报</td></tr>
+        <tr><td>82%认为重要、8%有进展</td><td>行业实践数据</td></tr>
+        <tr><td>AI省10%年人工预算</td><td>项目验证数据</td></tr>
+        <tr><td>8-12周试点周期</td><td>项目验证数据</td></tr>
+        <tr><td>人力规划管线（预测→排班）</td><td>已落地能力</td></tr>
+        <tr><td>流失预测准确率92%</td><td>已落地能力</td></tr>
+      </tbody>
+    </table>
   </div>
 </section>
 
-<!-- ============ 区块6：底部 CTA ============ -->
-<section id="cta">
-  <div class="card text-center cta-glow" style="background:linear-gradient(135deg,rgba(0,230,118,.08),rgba(68,138,255,.06))">
-    <h2 class="text-2xl md:text-3xl font-extrabold mb-3">
-      你的供应链被压价 <span class="text-red-400">30%</span>，还能撑多久？
-    </h2>
-    <p class="text-gray-400 mb-6 max-w-xl mx-auto">
-      本田巨头都扛不住要砍 630 亿，你能跟他们比吗？
-      把你的零部件类型留在评论区，测算器链接发你，提前算一算。
-    </p>
-    <div class="inline-block">
-      <div class="px-8 py-4 rounded-xl bg-green-500 text-black font-bold text-lg">
-        📩 评论区留言你的零部件类型 → 获取测算器
-      </div>
+<section>
+  <div class="container">
+    <div class="cta">
+      <h2>算一算你的人力成本还能省多少</h2>
+      <p>填 5 个数，1 分钟算出超员成本、缺员损失、招聘浪费，以及 AI 优化后能省多少。</p>
+      <a href="calculator.html" class="btn">🧮 打开人力规划测算器</a>
+      <div class="note">评论区留你的行业，测算器链接发你 · 看看还能撑多久</div>
     </div>
-    <div class="flex flex-wrap justify-center gap-2 mt-6">
-      <span class="badge badge-amber">冲压件</span>
-      <span class="badge badge-amber">电子件</span>
-      <span class="badge badge-amber">座椅</span>
-      <span class="badge badge-amber">车架</span>
-      <span class="badge badge-amber">软件</span>
-      <span class="badge badge-amber">其他</span>
-    </div>
-    <p class="text-xs text-gray-600 mt-6">看看还能撑多久，别等亏钱了才想起来。</p>
   </div>
 </section>
 
-<footer class="text-center text-xs text-gray-600 pt-8">
-  方案页面 · 数据全部来自原文实锤 · 测算假设已透明标注<br>
-  GitHub 项目优先选取有 Live Demo / Streamlit UI / Docker 部署的计算优化类
+<footer>
+  <div class="container">案例数据来自公开信息，效果数据来自行业项目实践 · 本页为行业方案展示</div>
 </footer>
 
-</main>
-
 <script>
-  const $ = id => document.getElementById(id);
+const D={tooltip:{backgroundColor:'rgba(15,23,42,.95)',borderColor:'#3b82f6',textStyle:{color:'#e2e8f0'},padding:10,borderRadius:6},
+  legend:{textStyle:{color:'#94a3b8',fontSize:10}},
+  grid:{left:'3%',right:'4%',bottom:'8%',top:'20%',containLabel:true}}
+const AX={axisLine:{lineStyle:{color:'#334155'}},axisTick:{show:false},axisLabel:{color:'#64748b',fontSize:10},splitLine:{lineStyle:{color:'#1e293b'}}}
 
-  function calc(){
-    const dep = +$('dep').value;
-    const cut = +$('cut').value;
-    const rev = +$('rev').value || 0;
-    const margin = +$('margin').value;
+function spk(id,data,color){
+  echarts.init(document.getElementById(id)).setOption({
+    grid:{left:0,right:0,top:0,bottom:0},xAxis:{type:'category',show:false,data:data.map((_,i)=>i)},yAxis:{type:'value',show:false},
+    series:[{type:'line',data,smooth:true,symbol:'none',lineStyle:{color,width:1.5},
+      areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:color+'55'},{offset:1,color:color+'00'}])}}]
+  })
+}
+spk('sp1',[2680,2720,2760,2810,2880,2940,2990,3050,3100,3140,3180,3218],'#60a5fa')
+spk('sp2',[9.5,10.2,8.8,11.5,10.1,11.2,9.8,10.5,9.2,10.0,9.5,11.8],'#fbbf24')
+spk('sp3',[4420,4400,4380,4350,4300,4250,4200,4150,4120,4080,4050,4042],'#f87171')
+spk('sp4',[0,200,500,900,1400,2000,2600,3200,3700,4000,4150,4230],'#34d399')
 
-    $('depVal').textContent = dep;
-    $('cutVal').textContent = cut;
-    $('marginVal').textContent = margin;
+const m=['7月','8月','9月','10月','11月','12月','1月','2月','3月','4月','5月','6月']
+echarts.init(document.getElementById('dc1')).setOption({...D,
+  legend:{...D.legend,top:0},
+  xAxis:{type:'category',data:m,...AX},yAxis:{type:'value',...AX},
+  series:[
+    {name:'目标区间',type:'line',data:[2700,2750,2800,2850,2900,2950,3000,3060,3100,3150,3180,3220].map(t=>t+60),lineStyle:{opacity:0},stack:'b',areaStyle:{color:'rgba(59,130,246,.06)'},symbol:'none'},
+    {name:'目标区间下',type:'line',data:[2700,2750,2800,2850,2900,2950,3000,3060,3100,3150,3180,3220].map(t=>t-60),lineStyle:{opacity:0},stack:'b',symbol:'none'},
+    {name:'正式工',type:'line',data:[1920,1940,1960,1990,2020,2050,2080,2110,2140,2160,2180,2200],smooth:true,stack:'t',areaStyle:{color:'rgba(59,130,246,.25)'},lineStyle:{color:'#60a5fa',width:2},symbol:'circle',symbolSize:4},
+    {name:'外包',type:'line',data:[520,540,560,580,600,620,640,660,680,700,710,720],smooth:true,stack:'t',areaStyle:{color:'rgba(52,211,153,.25)'},lineStyle:{color:'#34d399',width:2},symbol:'circle',symbolSize:4},
+    {name:'实习生',type:'line',data:[140,145,150,155,160,165,170,172,175,178,180,198],smooth:true,stack:'t',areaStyle:{color:'rgba(167,139,250,.25)'},lineStyle:{color:'#a78bfa',width:2},symbol:'circle',symbolSize:4}
+  ]
+})
 
-    const afterMargin = margin - (dep * cut) / 100;
-    $('afterMargin').textContent = afterMargin.toFixed(1);
+echarts.init(document.getElementById('dc2')).setOption({...D,
+  tooltip:{...D.tooltip,trigger:'item'},
+  series:[{type:'pie',radius:['40%','68%'],center:['50%','50%'],
+    label:{color:'#94a3b8',fontSize:10,formatter:'{b}\n{d}%'},
+    itemStyle:{borderColor:'#1e293b',borderWidth:2},
+    data:[{value:2200,name:'正式工',itemStyle:{color:'#60a5fa'}},{value:720,name:'外包',itemStyle:{color:'#34d399'}},{value:198,name:'实习生',itemStyle:{color:'#a78bfa'}}]}]
+})
 
-    const invCostRatio = 0.25;
-    const downCostRatio = 0.08;
-    const badOrderRatio = 0.075;
+echarts.init(document.getElementById('dc3')).setOption({...D,
+  tooltip:{...D.tooltip,trigger:'axis'},
+  xAxis:{type:'category',data:['正式工','外包','实习生'],...AX},
+  yAxis:{type:'value',name:'万元',nameTextStyle:{color:'#64748b',fontSize:9},...AX},
+  series:[{type:'bar',data:[17.4,5.8,3.2],barWidth:40,
+    itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#f87171'},{offset:1,color:'#7f1d1d'}]),borderRadius:[4,4,0,0]},
+    label:{show:true,position:'top',color:'#e2e8f0',fontSize:12,fontWeight:'bold',formatter:'{c}万'}}]
+})
 
-    const saveInv = rev * invCostRatio * 0.32;
-    const saveDown = rev * downCostRatio * 0.73;
-    const saveBad = rev * badOrderRatio;
-    const totalSave = saveInv + saveDown + saveBad;
+echarts.init(document.getElementById('dc4')).setOption({...D,
+  tooltip:{...D.tooltip},
+  legend:{...D.legend,bottom:0},
+  radar:{indicator:[
+    {name:'稳定性',max:100},{name:'成本控制',max:100},{name:'效率',max:100},{name:'满意度',max:100},{name:'流失控制',max:100}
+  ],axisName:{color:'#94a3b8',fontSize:10},splitLine:{lineStyle:{color:'#334155'}},splitArea:{areaStyle:{color:['rgba(59,130,246,.02)','rgba(59,130,246,.05)']}},axisLine:{lineStyle:{color:'#334155'}}},
+  series:[{type:'radar',data:[
+    {value:[85,72,88,76,90],name:'AI优化后',areaStyle:{color:'rgba(52,211,153,.25)'},lineStyle:{color:'#34d399',width:2},itemStyle:{color:'#34d399'}},
+    {value:[60,45,65,52,58],name:'传统规划',areaStyle:{color:'rgba(248,113,113,.12)'},lineStyle:{color:'#f87171',width:2},itemStyle:{color:'#f87171'}}
+  ]}]
+})
 
-    $('saveInv').textContent = Math.round(saveInv).toLocaleString();
-    $('saveDown').textContent = Math.round(saveDown).toLocaleString();
-    $('saveBad').textContent = Math.round(saveBad).toLocaleString();
-    $('savings').textContent = Math.round(totalSave).toLocaleString();
+const hd=['冲压','焊接','装配','质检','仓储','技术','销售','设备']
+const hm=['1月','2月','3月','4月','5月','6月']
+const hmd=[]
+for(let i=0;i<hd.length;i++)for(let j=0;j<hm.length;j++)hmd.push([j,i,Math.round((Math.sin(i*1.3+j*.7)+1.5)*30+Math.random()*20)])
+echarts.init(document.getElementById('dc5')).setOption({...D,
+  tooltip:{...D.tooltip,formatter:p=>`${hd[p.value[1]]} · ${hm[p.value[0]]}<br>超员率: ${p.value[2]}%`},
+  grid:{left:'10%',right:'4%',bottom:'14%',top:'8%'},
+  xAxis:{type:'category',data:hm,splitArea:{show:true},...AX},
+  yAxis:{type:'category',data:hd,splitArea:{show:true},...AX},
+  visualMap:{min:0,max:100,calculable:true,orient:'horizontal',left:'center',bottom:0,textStyle:{color:'#94a3b8',fontSize:9},
+    inRange:{color:['#064e3b','#34d399','#fbbf24','#f87171']}},
+  series:[{type:'heatmap',data:hmd,label:{show:true,color:'#0f172a',fontSize:9,fontWeight:'bold'},
+    itemStyle:{borderColor:'#1e293b',borderWidth:1}}]
+})
 
-    const aiMarginPct = totalSave / rev * 100;
-    const aiMargin = afterMargin + aiMarginPct;
-    $('aiMargin').textContent = aiMargin.toFixed(1);
-
-    let advice = '';
-    if(afterMargin < 0){
-      advice = `⚠️ <strong class="text-red-300">危险信号</strong>：被压价后利润率已跌至 ${afterMargin.toFixed(1)}%，处于亏损状态。当前模式不可持续，必须立即引入订单分配优化，砍掉亏损订单。参考本田做法，用 MILP/ILP 求解器重新规划接单组合。`;
-    } else if(afterMargin < 2){
-      advice = `🔴 <strong class="text-red-300">薄利预警</strong>：被压价后利润率仅 ${afterMargin.toFixed(1)}%，接近本田 0.3% 的危险线。建议尽快部署 AI 排程，靠库存降 32%、停机降 73% 把利润拉回安全区。`;
-    } else if(afterMargin < 5){
-      advice = `🟡 <strong class="text-amber-300">承压运行</strong>：被压价后利润率 ${afterMargin.toFixed(1)}%，仍有空间但抗风险弱。建议测算 AI 优化后的增量利润（约 ${aiMarginPct.toFixed(1)} 个百分点），评估引入 MILP 规划的 ROI。`;
-    } else {
-      advice = `🟢 <strong class="text-green-300">相对健康</strong>：被压价后利润率 ${afterMargin.toFixed(1)}%，暂时安全。但大客户依赖度 ${dep}% 仍是隐疾，建议用供应商风险评分工具监控集中度，提前分散订单。`;
-    }
-
-    if(aiMargin > afterMargin){
-      advice += `<br><br>📈 AI 优化可使利润率从 <span class="text-red-300">${afterMargin.toFixed(1)}%</span> 提升至 <span class="text-green-300">${aiMargin.toFixed(1)}%</span>，年节省约 <span class="text-green-300">${Math.round(totalSave).toLocaleString()} 万元</span>。`;
-    }
-    $('advice').innerHTML = advice;
-  }
-
-  function applyCase(type){
-    if(type==='ts'){ $('dep').value=90; $('cut').value=30; $('margin').value=5; }
-    else if(type==='hone'){ $('dep').value=86; $('cut').value=30; $('margin').value=4; }
-    else if(type==='honda'){ $('dep').value=60; $('cut').value=30; $('margin').value=0.3; }
-    calc();
-  }
-
-  ['dep','cut','margin','rev'].forEach(id=>{
-    $(id).addEventListener('input', calc);
-  });
-
-  calc();
+echarts.init(document.getElementById('dc6')).setOption({...D,
+  grid:{left:'28%',right:'8%',top:'5%',bottom:'8%'},
+  xAxis:{type:'value',name:'影响权重(%)',nameTextStyle:{color:'#64748b',fontSize:9},...AX},
+  yAxis:{type:'category',data:['距上次晋升','加班时长','月收入','工作满意度','总工作年限','在司年限','通勤距离','日薪水平'].reverse(),...AX,axisLabel:{color:'#94a3b8',fontSize:10}},
+  series:[{type:'bar',data:[4.8,4.9,5.3,5.4,7.3,9.2,11.9,12.5].reverse(),barWidth:12,
+    itemStyle:{color:new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:'#60a5fa'},{offset:1,color:'#34d399'}]),borderRadius:[0,4,4,0]},
+    label:{show:true,position:'right',color:'#94a3b8',fontSize:9,formatter:'{c}%'}}]
+})
 </script>
-
 </body>
 </html>
