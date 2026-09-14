@@ -1,12 +1,12 @@
-﻿{
+{
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "auto-cost-reduction-site",
+  "account_id": "98586007cd2e1e4d7b87352225630b8c",
   "compatibility_date": "2026-09-11",
   "observability": {
     "enabled": true
   },
   "assets": {
-    "directory": ".",
-    "exclude": [".git", ".wrangler", "node_modules", "*.log", ".github"]
+    "directory": "."
   }
 }
