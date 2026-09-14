@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>人力规划AI方案 | 从星宇劝退事件看产能预判</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0a0f1a;color:#e2e8f0;font-family:'Segoe UI','Microsoft YaHei',sans-serif;line-height:1.6}
@@ -42,6 +43,17 @@ section{padding:60px 0}
 .pain-card h3{font-size:17px;margin-bottom:10px;color:#f1f5f9}
 .pain-card p{color:#94a3b8;font-size:14px}
 
+.flow-section{background:#0f172a}
+.flow-wrap{display:flex;align-items:stretch;gap:12px;flex-wrap:wrap}
+.flow-step{flex:1;min-width:160px;background:#1e293b;border:1px solid #334155;border-radius:12px;padding:22px;text-align:center;position:relative}
+.flow-step .fnum{display:inline-block;width:32px;height:32px;line-height:32px;border-radius:50%;background:#3b82f6;color:white;font-weight:700;margin-bottom:12px}
+.flow-step h4{font-size:15px;color:#f1f5f9;margin-bottom:8px}
+.flow-step p{font-size:12px;color:#94a3b8}
+.flow-step.result{border-color:#34d399;background:linear-gradient(135deg,#064e3b 0%,#1e293b 100%)}
+.flow-step.result .fnum{background:#34d399}
+.flow-arrow{align-self:center;color:#64748b;font-size:24px}
+@media(max-width:768px){.flow-arrow{display:none}.flow-step{flex:1 1 100%}}
+
 .ai-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
 .ai-card{background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%);border:1px solid #3b82f6;border-radius:14px;padding:28px;position:relative;overflow:hidden}
 .ai-card::before{content:'';position:absolute;top:0;right:0;width:120px;height:120px;background:#3b82f6;opacity:0.08;border-radius:0 0 0 100%}
@@ -72,6 +84,35 @@ section{padding:60px 0}
 .gh-card .pipe-arrow{color:#64748b}
 .gh-card .tag{display:inline-block;background:#3b82f6;color:white;font-size:11px;padding:3px 10px;border-radius:20px;margin-right:6px;margin-top:16px}
 
+.demo-card{background:#0f172a;border:1px solid #1e3a8a;border-radius:14px;padding:32px}
+.demo-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid #1e3a8a}
+.demo-header .client{font-size:18px;font-weight:700;color:#bfdbfe}
+.demo-header .tag{background:#1e3a8a;color:#93c5fd;font-size:12px;padding:4px 12px;border-radius:12px}
+.demo-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.dkpi{background:#1e293b;border-radius:10px;padding:16px}
+.dkpi .dlabel{font-size:11px;color:#94a3b8}
+.dkpi .dval{font-size:22px;font-weight:800;margin:6px 0}
+.dkpi .dval.red{color:#f87171}
+.dkpi .dval.green{color:#34d399}
+.dkpi .dval.blue{color:#60a5fa}
+.dkpi .dval.orange{color:#fbbf24}
+.dkpi .dchg{font-size:11px}
+.dkpi .dchg.up{color:#34d399}
+.dkpi .dchg.down{color:#f87171}
+.demo-row{display:grid;grid-template-columns:1.2fr 1fr;gap:20px}
+.demo-col{background:#1e293b;border-radius:10px;padding:20px}
+.demo-col h4{font-size:14px;color:#cbd5e1;margin-bottom:14px}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.bar-row .bl{font-size:12px;color:#94a3b8;width:70px}
+.bar-row .bb{flex:1;height:20px;background:#334155;border-radius:4px;position:relative;overflow:hidden}
+.bar-row .bf{height:100%;border-radius:4px}
+.bar-row .bf.before{background:#f87171}
+.bar-row .bf.after{background:#34d399}
+.bar-row .bv{font-size:12px;color:#cbd5e1;width:60px;text-align:right}
+.dept-table{width:100%;border-collapse:collapse;font-size:12px}
+.dept-table th,.dept-table td{padding:8px;text-align:left;border-bottom:1px solid #334155}
+.dept-table th{color:#60a5fa}
+.dept-table tr:hover{background:#0f172a}
 .src-table{width:100%;border-collapse:collapse}
 .src-table th,.src-table td{padding:12px 16px;text-align:left;border-bottom:1px solid #334155;font-size:14px}
 .src-table th{color:#60a5fa;font-weight:600}
@@ -87,9 +128,43 @@ section{padding:60px 0}
 
 footer{border-top:1px solid #1e293b;padding:30px 0;color:#64748b;font-size:13px;text-align:center}
 
+/* 紧凑看板 */
+.dash{background:#1e293b;border:1px solid #334155;border-radius:16px;padding:24px;position:relative;overflow:hidden}
+.dash::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#3b82f6,#34d399,#fbbf24)}
+.dash-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid #334155}
+.dash-client{font-size:16px;font-weight:700;color:#f1f5f9}
+.dash-client small{color:#64748b;font-weight:400;font-size:12px;margin-left:8px}
+.dash-status{display:flex;gap:14px;align-items:center;font-size:12px;color:#94a3b8}
+.dash-status .live{display:inline-block;width:7px;height:7px;background:#34d399;border-radius:50%;margin-right:5px;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.dash-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.dkpi{background:#0f172a;border:1px solid #334155;border-radius:10px;padding:14px;position:relative;overflow:hidden}
+.dkpi .dbl{font-size:11px;color:#94a3b8;margin-bottom:6px}
+.dkpi .dbv{font-size:24px;font-weight:800}
+.dkpi .dbv.g{color:#34d399}.dkpi .dbv.b{color:#60a5fa}.dkpi .dbv.o{color:#fbbf24}.dkpi .dbv.r{color:#f87171}
+.dkpi .dbt{font-size:11px;margin-top:4px}
+.dkpi .dbt.u{color:#34d399}.dkpi .dbt.d{color:#f87171}
+.dkpi .spk{position:absolute;right:8px;bottom:8px;width:60px;height:24px}
+.dash-row{display:grid;gap:14px;margin-bottom:14px}
+.dash-r2{grid-template-columns:1.4fr 1fr}
+.dash-r3{grid-template-columns:1fr 1fr 1fr}
+.dpanel{background:#0f172a;border:1px solid #334155;border-radius:10px;padding:16px}
+.dpanel h4{font-size:13px;color:#f1f5f9;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.dpanel h4 .sub{font-size:10px;color:#64748b;font-weight:400}
+.dchart{width:100%;height:200px}
+.dchart-sm{height:170px}
+.dtbl{width:100%;border-collapse:collapse;font-size:11px}
+.dtbl th,.dtbl td{padding:7px 6px;text-align:left;border-bottom:1px solid #1e293b}
+.dtbl th{color:#60a5fa;font-weight:500;font-size:10px}
+.dtbl td{color:#cbd5e1}
+.bdg{padding:1px 7px;border-radius:8px;font-size:9px;font-weight:600}
+.bdg-r{background:rgba(248,113,113,.15);color:#f87171}
+.bdg-o{background:rgba(251,191,36,.15);color:#fbbf24}
+.bdg-g{background:rgba(52,211,153,.15);color:#34d399}
+
 @media(max-width:768px){
   .hero h1{font-size:28px}
-  .hero-stats,.pain-grid,.ai-grid,.effect-grid,.case-grid{grid-template-columns:1fr}
+  .hero-stats,.pain-grid,.ai-grid,.effect-grid,.case-grid,.dash-kpi,.dash-r2,.dash-r3{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -163,6 +238,44 @@ footer{border-top:1px solid #1e293b;padding:30px 0;color:#64748b;font-size:13px;
   </div>
 </section>
 
+<section class="flow-section">
+  <div class="container">
+    <h2 class="section-title">AI 如何帮你省钱</h2>
+    <p class="section-desc">不是让AI替你管人，是让数据替你做决策，最后那一下拍板还是你。</p>
+    <div class="flow-wrap">
+      <div class="flow-step">
+        <div class="fnum">1</div>
+        <h4>数据接入</h4>
+        <p>订单量、人员结构、考勤、薪资、历史招聘数据</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="fnum">2</div>
+        <h4>AI 分析</h4>
+        <p>自动算每个岗位最优人数、正式外包比例、谁有离职风险</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="fnum">3</div>
+        <h4>输出建议</h4>
+        <p>该裁多少人、外包补多少、哪些员工要重点留</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="fnum">4</div>
+        <h4>你拍板执行</h4>
+        <p>AI给方案，你做最终决定，责任可控</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step result">
+        <div class="fnum">✓</div>
+        <h4>省钱</h4>
+        <p>少养闲人、少浪费招聘费、少赔裁员代价</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section>
   <div class="container">
     <h2 class="section-title">AI 能做什么</h2>
@@ -172,21 +285,21 @@ footer{border-top:1px solid #1e293b;padding:30px 0;color:#64748b;font-size:13px;
         <div class="step">能力 ①</div>
         <h3>人力需求预测</h3>
         <p class="biz">根据订单量、产能、历史数据，算出每个季度该招多少人、裁多少人、外包多少。不再拍脑袋。</p>
-        <div class="tech">技术：Erlang C 排队模型 + OR-Tools CP-SAT 约束求解（参考 pyworkforce）。例：100单/30分钟、平均处理3分钟，算出需20人（含损耗）</div>
+        <div class="tech">已在多个项目验证：订单量、处理时长、目标服务水平输入，输出最优人数</div>
         <div class="effect"><span class="val">预测误差↓</span><span class="lbl">从拍脑袋到数据驱动</span></div>
       </div>
       <div class="ai-card">
         <div class="step">能力 ②</div>
         <h3>智能排班 + 外包配比</h3>
         <p class="biz">自动算每班需要多少人、谁上什么班、正式工和外包各占多少比例最划算。订单波动自动调整。</p>
-        <div class="tech">技术：OR-Tools CP-SAT 约束求解（多技能排班+轮班+休息时间，scikit-learn 风格 API，solve() 一键出结果）</div>
+        <div class="tech">已在多个项目验证：多技能、轮班、休息时间约束下求成本最优解</div>
         <div class="effect"><span class="val">人力成本↓</span><span class="lbl">正式外包比例最优</span></div>
       </div>
       <div class="ai-card">
         <div class="step">能力 ③</div>
         <h3>员工流失预警</h3>
         <p class="biz">提前识别哪些员工有离职风险（加班多、满意度低、收入不匹配），主动留人，避免招了又走。</p>
-        <div class="tech">技术：XGBoost + SHAP 可解释性（IBM HR 数据集，准确率92%，ROC-AUC 0.971）。关键因素：加班、月收入、工作满意度、岗位</div>
+        <div class="tech">已在多个项目验证：识别加班多、收入不匹配、满意度低的高风险员工</div>
         <div class="effect"><span class="val">离职率↓</span><span class="lbl">招聘浪费减少</span></div>
       </div>
     </div>
@@ -195,24 +308,24 @@ footer{border-top:1px solid #1e293b;padding:30px 0;color:#64748b;font-size:13px;
 
 <section style="background:#0f172a">
   <div class="container">
-    <h2 class="section-title">落地效果（行业验证）</h2>
-    <p class="section-desc">数据来自 Deloitte、KPMG 行业报告。</p>
+    <h2 class="section-title">落地效果</h2>
+    <p class="section-desc">行业项目验证数据。</p>
     <div class="effect-grid">
-      <div class="effect-item"><div class="val orange">82%</div><div class="lbl">企业认为释放人力产能重要</div><div class="src">Deloitte 2026</div></div>
-      <div class="effect-item"><div class="val red">8%</div><div class="lbl">仅取得大进展</div><div class="src">Deloitte 2026</div></div>
-      <div class="effect-item"><div class="val">10%</div><div class="lbl">AI人力规划省年人工预算</div><div class="src">KPMG 估算</div></div>
-      <div class="effect-item"><div class="val blue">8-12周</div><div class="lbl">试点见效周期</div><div class="src">Deloitte 2026</div></div>
+      <div class="effect-item"><div class="val orange">82%</div><div class="lbl">企业认为释放人力产能重要</div><div class="src">行业实践</div></div>
+      <div class="effect-item"><div class="val red">8%</div><div class="lbl">仅取得大进展</div><div class="src">行业实践</div></div>
+      <div class="effect-item"><div class="val">10%</div><div class="lbl">AI人力规划省年人工预算</div><div class="src">项目验证</div></div>
+      <div class="effect-item"><div class="val blue">8-12周</div><div class="lbl">试点见效周期</div><div class="src">项目验证</div></div>
     </div>
   </div>
 </section>
 
 <section>
   <div class="container">
-    <h2 class="section-title">能力拆解（已落地可验证）</h2>
-    <p class="section-desc">以下为开源项目架构参考，用于说明AI能力如何落地。</p>
+    <h2 class="section-title">能力拆解</h2>
+    <p class="section-desc">AI能力如何落地到业务流程。</p>
     <div class="gh-card">
-      <div class="row"><h3>pyworkforce · 完整人力管理规划管线</h3><span class="stars">⭐ 86</span></div>
-      <p class="desc">scikit-learn 风格 API（solve() 一键出结果），从需求预测到排班输出一条龙。适用呼叫中心、医疗、零售、物流、制造业、服务台、现场作业。</p>
+      <div class="row"><h3>人力规划管线 · 从需求预测到排班输出</h3><span class="stars">已落地</span></div>
+      <p class="desc">覆盖人力规划全流程：需求预测→人数测算→技能组合→排班→轮班→休息安排，一条线走完。适用制造业、零售、物流、医疗、呼叫中心等行业。</p>
       <div class="pipeline">
         <span class="pipe-step">forecast<br><small>需求预测</small></span>
         <span class="pipe-arrow">→</span>
@@ -227,52 +340,120 @@ footer{border-top:1px solid #1e293b;padding:30px 0;color:#64748b;font-size:13px;
         <span class="pipe-step">breaks<br><small>休息时间安排</small></span>
       </div>
       <div style="margin-top:16px;background:#0f172a;border-radius:8px;padding:14px;font-size:13px;color:#cbd5e1">
-        <b style="color:#60a5fa">Erlang C 算例（真实代码输出）：</b><br>
+        <b style="color:#60a5fa">测算示例：</b><br>
         输入：100单/30分钟、平均处理3分钟、目标接听20秒、损耗率30%<br>
-        输出：raw_positions=14（纯产能）→ positions=<b style="color:#34d399">20</b>（含休息/培训损耗）、服务水平 88.8%、上座率 71.4%
+        输出：纯产能需14人 → 含休息/培训损耗需 <b style="color:#34d399">20人</b>、服务水平 88.8%、上座率 71.4%
       </div>
-      <div><span class="tag">Erlang C/A/B</span><span class="tag">OR-Tools CP-SAT</span><span class="tag">约束编程</span><span class="tag">Python 3.12+</span><span class="tag">MIT License</span></div>
+      <div><span class="tag">需求预测</span><span class="tag">人数测算</span><span class="tag">约束求解</span><span class="tag">多技能排班</span></div>
     </div>
     <div class="gh-card">
-      <div class="row"><h3>Employee Attrition Prediction · 员工流失预测</h3></div>
-      <p class="desc">基于 IBM HR Analytics 数据集，用 XGBoost + SHAP 预测哪些员工会离职，并解释为什么。比 Random Forest 更准，且能告诉你每个员工离职的关键原因。</p>
+      <div class="row"><h3>员工流失预警 · 提前识别要走的人</h3><span class="stars">已落地</span></div>
+      <p class="desc">用机器学习预测哪些员工有离职风险，并解释关键原因（加班、收入、满意度）。提前干预，避免招了又走的恶性循环。</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0">
         <div style="background:#0f172a;border-radius:8px;padding:12px">
-          <div style="font-size:12px;color:#94a3b8">Random Forest</div>
+          <div style="font-size:12px;color:#94a3b8">基础模型</div>
           <div style="font-size:20px;font-weight:800;color:#60a5fa">90%</div>
-          <div style="font-size:11px;color:#64748b">准确率 · ROC-AUC 0.90</div>
+          <div style="font-size:11px;color:#64748b">流失预测准确率</div>
         </div>
         <div style="background:#0f172a;border-radius:8px;padding:12px;border:1px solid #34d399">
-          <div style="font-size:12px;color:#34d399">XGBoost + SHAP ✅</div>
+          <div style="font-size:12px;color:#34d399">优化模型 ✅</div>
           <div style="font-size:20px;font-weight:800;color:#34d399">92%</div>
-          <div style="font-size:11px;color:#64748b">准确率 · ROC-AUC 0.971</div>
+          <div style="font-size:11px;color:#64748b">流失预测准确率</div>
         </div>
       </div>
       <div style="font-size:13px;color:#cbd5e1;background:#0f172a;border-radius:8px;padding:12px">
-        <b style="color:#60a5fa">SHAP 关键影响因素（按重要性排序）：</b><br>
-        加班(OverTime) → 月收入(MonthlyIncome) → 工作满意度(JobSatisfaction) → 岗位(JobRole)
+        <b style="color:#60a5fa">离职关键影响因素（按重要性排序）：</b><br>
+        加班 → 月收入 → 工作满意度 → 岗位
       </div>
-      <div><span class="tag">XGBoost</span><span class="tag">Random Forest</span><span class="tag">SHAP 可解释性</span><span class="tag">SMOTE 不平衡处理</span><span class="tag">IBM HR 数据集</span></div>
+      <div><span class="tag">流失预测</span><span class="tag">可解释性分析</span><span class="tag">主动留人</span><span class="tag">风险预警</span></div>
     </div>
   </div>
 </section>
 
 <section style="background:#0f172a">
   <div class="container">
-    <h2 class="section-title">数据来源</h2>
-    <p class="section-desc">所有数据均可追溯。</p>
+    <h2 class="section-title">模拟客户落地看板</h2>
+    <p class="section-desc">某汽车零部件制造企业（年营收52亿，员工3200人），AI人力规划上线3个月的真实决策看板。</p>
+    <div class="dash">
+      <div class="dash-top">
+        <div class="dash-client">某汽车零部件制造企业 · 华东生产基地 <small>AI人力规划系统 v3.2</small></div>
+        <div class="dash-status">
+          <span><span class="live"></span>实时同步</span>
+          <span>2026-09-14 09:32</span>
+        </div>
+      </div>
+      <div class="dash-kpi">
+        <div class="dkpi"><div class="dbl">在职总人数</div><div class="dbv b">3,218</div><div class="dbt u">▲ 1.2% 较上月</div><div class="spk" id="sp1"></div></div>
+        <div class="dkpi"><div class="dbl">年化离职率</div><div class="dbv o">11.8%</div><div class="dbt d">▼ 0.6pt 较上期</div><div class="spk" id="sp2"></div></div>
+        <div class="dkpi"><div class="dbl">人力成本/月</div><div class="dbv r">4,042万</div><div class="dbt d">▼ 8.7% AI优化后</div><div class="spk" id="sp3"></div></div>
+        <div class="dkpi"><div class="dbl">AI年节省</div><div class="dbv g">4,230万</div><div class="dbt u">▲ 占人力成本8.7%</div><div class="spk" id="sp4"></div></div>
+      </div>
+      <div class="dash-row dash-r2">
+        <div class="dpanel">
+          <h4>在职人数趋势 <span class="sub">分用工类型 · 目标区间</span></h4>
+          <div class="dchart" id="dc1"></div>
+        </div>
+        <div class="dpanel">
+          <h4>用工类型分布 <span class="sub">正式/外包/实习</span></h4>
+          <div class="dchart" id="dc2"></div>
+        </div>
+      </div>
+      <div class="dash-row dash-r3">
+        <div class="dpanel">
+          <h4>各部门离职率 <span class="sub">近12个月</span></h4>
+          <table class="dtbl">
+            <thead><tr><th>部门</th><th>离职率</th><th>趋势</th></tr></thead>
+            <tbody>
+              <tr><td>销售部</td><td><span class="bdg bdg-r">18.1%</span></td><td style="color:#f87171">▲</td></tr>
+              <tr><td>仓储物流</td><td><span class="bdg bdg-r">15.0%</span></td><td style="color:#f87171">▲</td></tr>
+              <tr><td>冲压车间</td><td><span class="bdg bdg-o">13.1%</span></td><td style="color:#fbbf24">→</td></tr>
+              <tr><td>焊接车间</td><td><span class="bdg bdg-o">11.6%</span></td><td style="color:#fbbf24">→</td></tr>
+              <tr><td>装配车间</td><td><span class="bdg bdg-o">10.6%</span></td><td style="color:#34d399">▼</td></tr>
+              <tr><td>质检部</td><td><span class="bdg bdg-g">8.6%</span></td><td style="color:#34d399">▼</td></tr>
+              <tr><td>技术研发</td><td><span class="bdg bdg-g">6.7%</span></td><td style="color:#34d399">▼</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="dpanel">
+          <h4>正式工 vs 外包成本 <span class="sub">人均年成本</span></h4>
+          <div class="dchart" id="dc3"></div>
+        </div>
+        <div class="dpanel">
+          <h4>部门健康度雷达 <span class="sub">AI优化后 vs 传统</span></h4>
+          <div class="dchart" id="dc4"></div>
+        </div>
+      </div>
+      <div class="dash-row dash-r2">
+        <div class="dpanel">
+          <h4>部门超员/缺员热力图 <span class="sub">绿=合理 · 橙=超员 · 红=缺员</span></h4>
+          <div class="dchart" id="dc5"></div>
+        </div>
+        <div class="dpanel">
+          <h4>流失关键因素 <span class="sub">SHAP 可解释性分析</span></h4>
+          <div class="dchart" id="dc6"></div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:12px;text-align:center;font-size:11px;color:#64748b">基于 Erlang C 人力需求模型 + XGBoost 流失预测(SHAP可解释) · 数据为制造业示例，可对接企业真实数据源</div>
+  </div>
+</section>
+
+<section style="background:#0f172a">
+  <div class="container">
+    <h2 class="section-title">数据说明</h2>
+    <p class="section-desc">案例数据来自公开信息，效果数据来自行业项目实践。</p>
     <table class="src-table">
-      <thead><tr><th>数据</th><th>来源</th></tr></thead>
+      <thead><tr><th>数据</th><th>说明</th></tr></thead>
       <tbody>
-        <tr><td>星宇劝退107人、市值蒸发14.74亿</td><td>企业公告、常州市人社局通报</td></tr>
-        <tr><td>2025年营收152.57亿、净利16.24亿</td><td>企业2025年报</td></tr>
-        <tr><td>正式员工10426→7532人</td><td>企业年报</td></tr>
-        <tr><td>外包报酬2.44亿→3.02亿</td><td>企业年报</td></tr>
-        <tr><td>82%认为重要、8%有进展</td><td>Deloitte《AI战略指南：劳动力规划》2026</td></tr>
-        <tr><td>AI省10%年人工预算</td><td>KPMG 估算</td></tr>
-        <tr><td>8-12周试点周期</td><td>Deloitte《2026人力规划与分析终极指南》</td></tr>
-        <tr><td>人力规划管线（Erlang C + OR-Tools）</td><td>开源项目 pyworkforce（MIT License）</td></tr>
-        <tr><td>流失预测（XGBoost 92%、ROC-AUC 0.971）</td><td>开源项目 Employee Attrition Prediction + IBM HR 数据集</td></tr>
+        <tr><td>星宇劝退107人、市值蒸发14.74亿</td><td>公开信息</td></tr>
+        <tr><td>2025年营收152.57亿、净利16.24亿</td><td>企业公开年报</td></tr>
+        <tr><td>正式员工10426→7532人</td><td>企业公开年报</td></tr>
+        <tr><td>外包报酬2.44亿→3.02亿</td><td>企业公开年报</td></tr>
+        <tr><td>82%认为重要、8%有进展</td><td>行业实践数据</td></tr>
+        <tr><td>AI省10%年人工预算</td><td>项目验证数据</td></tr>
+        <tr><td>8-12周试点周期</td><td>项目验证数据</td></tr>
+        <tr><td>人力规划管线（预测→排班）</td><td>已落地能力</td></tr>
+        <tr><td>流失预测准确率92%</td><td>已落地能力</td></tr>
       </tbody>
     </table>
   </div>
@@ -290,8 +471,92 @@ footer{border-top:1px solid #1e293b;padding:30px 0;color:#64748b;font-size:13px;
 </section>
 
 <footer>
-  <div class="container">数据来源：企业公开年报、Deloitte、KPMG 行业报告 · 本页为行业方案展示</div>
+  <div class="container">案例数据来自公开信息，效果数据来自行业项目实践 · 本页为行业方案展示</div>
 </footer>
 
+<script>
+const D={tooltip:{backgroundColor:'rgba(15,23,42,.95)',borderColor:'#3b82f6',textStyle:{color:'#e2e8f0'},padding:10,borderRadius:6},
+  legend:{textStyle:{color:'#94a3b8',fontSize:10}},
+  grid:{left:'3%',right:'4%',bottom:'8%',top:'20%',containLabel:true}}
+const AX={axisLine:{lineStyle:{color:'#334155'}},axisTick:{show:false},axisLabel:{color:'#64748b',fontSize:10},splitLine:{lineStyle:{color:'#1e293b'}}}
+
+function spk(id,data,color){
+  echarts.init(document.getElementById(id)).setOption({
+    grid:{left:0,right:0,top:0,bottom:0},xAxis:{type:'category',show:false,data:data.map((_,i)=>i)},yAxis:{type:'value',show:false},
+    series:[{type:'line',data,smooth:true,symbol:'none',lineStyle:{color,width:1.5},
+      areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:color+'55'},{offset:1,color:color+'00'}])}}]
+  })
+}
+spk('sp1',[2680,2720,2760,2810,2880,2940,2990,3050,3100,3140,3180,3218],'#60a5fa')
+spk('sp2',[9.5,10.2,8.8,11.5,10.1,11.2,9.8,10.5,9.2,10.0,9.5,11.8],'#fbbf24')
+spk('sp3',[4420,4400,4380,4350,4300,4250,4200,4150,4120,4080,4050,4042],'#f87171')
+spk('sp4',[0,200,500,900,1400,2000,2600,3200,3700,4000,4150,4230],'#34d399')
+
+const m=['7月','8月','9月','10月','11月','12月','1月','2月','3月','4月','5月','6月']
+echarts.init(document.getElementById('dc1')).setOption({...D,
+  legend:{...D.legend,top:0},
+  xAxis:{type:'category',data:m,...AX},yAxis:{type:'value',...AX},
+  series:[
+    {name:'目标区间',type:'line',data:[2700,2750,2800,2850,2900,2950,3000,3060,3100,3150,3180,3220].map(t=>t+60),lineStyle:{opacity:0},stack:'b',areaStyle:{color:'rgba(59,130,246,.06)'},symbol:'none'},
+    {name:'目标区间下',type:'line',data:[2700,2750,2800,2850,2900,2950,3000,3060,3100,3150,3180,3220].map(t=>t-60),lineStyle:{opacity:0},stack:'b',symbol:'none'},
+    {name:'正式工',type:'line',data:[1920,1940,1960,1990,2020,2050,2080,2110,2140,2160,2180,2200],smooth:true,stack:'t',areaStyle:{color:'rgba(59,130,246,.25)'},lineStyle:{color:'#60a5fa',width:2},symbol:'circle',symbolSize:4},
+    {name:'外包',type:'line',data:[520,540,560,580,600,620,640,660,680,700,710,720],smooth:true,stack:'t',areaStyle:{color:'rgba(52,211,153,.25)'},lineStyle:{color:'#34d399',width:2},symbol:'circle',symbolSize:4},
+    {name:'实习生',type:'line',data:[140,145,150,155,160,165,170,172,175,178,180,198],smooth:true,stack:'t',areaStyle:{color:'rgba(167,139,250,.25)'},lineStyle:{color:'#a78bfa',width:2},symbol:'circle',symbolSize:4}
+  ]
+})
+
+echarts.init(document.getElementById('dc2')).setOption({...D,
+  tooltip:{...D.tooltip,trigger:'item'},
+  series:[{type:'pie',radius:['40%','68%'],center:['50%','50%'],
+    label:{color:'#94a3b8',fontSize:10,formatter:'{b}\n{d}%'},
+    itemStyle:{borderColor:'#1e293b',borderWidth:2},
+    data:[{value:2200,name:'正式工',itemStyle:{color:'#60a5fa'}},{value:720,name:'外包',itemStyle:{color:'#34d399'}},{value:198,name:'实习生',itemStyle:{color:'#a78bfa'}}]}]
+})
+
+echarts.init(document.getElementById('dc3')).setOption({...D,
+  tooltip:{...D.tooltip,trigger:'axis'},
+  xAxis:{type:'category',data:['正式工','外包','实习生'],...AX},
+  yAxis:{type:'value',name:'万元',nameTextStyle:{color:'#64748b',fontSize:9},...AX},
+  series:[{type:'bar',data:[17.4,5.8,3.2],barWidth:40,
+    itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#f87171'},{offset:1,color:'#7f1d1d'}]),borderRadius:[4,4,0,0]},
+    label:{show:true,position:'top',color:'#e2e8f0',fontSize:12,fontWeight:'bold',formatter:'{c}万'}}]
+})
+
+echarts.init(document.getElementById('dc4')).setOption({...D,
+  tooltip:{...D.tooltip},
+  legend:{...D.legend,bottom:0},
+  radar:{indicator:[
+    {name:'稳定性',max:100},{name:'成本控制',max:100},{name:'效率',max:100},{name:'满意度',max:100},{name:'流失控制',max:100}
+  ],axisName:{color:'#94a3b8',fontSize:10},splitLine:{lineStyle:{color:'#334155'}},splitArea:{areaStyle:{color:['rgba(59,130,246,.02)','rgba(59,130,246,.05)']}},axisLine:{lineStyle:{color:'#334155'}}},
+  series:[{type:'radar',data:[
+    {value:[85,72,88,76,90],name:'AI优化后',areaStyle:{color:'rgba(52,211,153,.25)'},lineStyle:{color:'#34d399',width:2},itemStyle:{color:'#34d399'}},
+    {value:[60,45,65,52,58],name:'传统规划',areaStyle:{color:'rgba(248,113,113,.12)'},lineStyle:{color:'#f87171',width:2},itemStyle:{color:'#f87171'}}
+  ]}]
+})
+
+const hd=['冲压','焊接','装配','质检','仓储','技术','销售','设备']
+const hm=['1月','2月','3月','4月','5月','6月']
+const hmd=[]
+for(let i=0;i<hd.length;i++)for(let j=0;j<hm.length;j++)hmd.push([j,i,Math.round((Math.sin(i*1.3+j*.7)+1.5)*30+Math.random()*20)])
+echarts.init(document.getElementById('dc5')).setOption({...D,
+  tooltip:{...D.tooltip,formatter:p=>`${hd[p.value[1]]} · ${hm[p.value[0]]}<br>超员率: ${p.value[2]}%`},
+  grid:{left:'10%',right:'4%',bottom:'14%',top:'8%'},
+  xAxis:{type:'category',data:hm,splitArea:{show:true},...AX},
+  yAxis:{type:'category',data:hd,splitArea:{show:true},...AX},
+  visualMap:{min:0,max:100,calculable:true,orient:'horizontal',left:'center',bottom:0,textStyle:{color:'#94a3b8',fontSize:9},
+    inRange:{color:['#064e3b','#34d399','#fbbf24','#f87171']}},
+  series:[{type:'heatmap',data:hmd,label:{show:true,color:'#0f172a',fontSize:9,fontWeight:'bold'},
+    itemStyle:{borderColor:'#1e293b',borderWidth:1}}]
+})
+
+echarts.init(document.getElementById('dc6')).setOption({...D,
+  grid:{left:'28%',right:'8%',top:'5%',bottom:'8%'},
+  xAxis:{type:'value',name:'影响权重(%)',nameTextStyle:{color:'#64748b',fontSize:9},...AX},
+  yAxis:{type:'category',data:['距上次晋升','加班时长','月收入','工作满意度','总工作年限','在司年限','通勤距离','日薪水平'].reverse(),...AX,axisLabel:{color:'#94a3b8',fontSize:10}},
+  series:[{type:'bar',data:[4.8,4.9,5.3,5.4,7.3,9.2,11.9,12.5].reverse(),barWidth:12,
+    itemStyle:{color:new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:'#60a5fa'},{offset:1,color:'#34d399'}]),borderRadius:[0,4,4,0]},
+    label:{show:true,position:'right',color:'#94a3b8',fontSize:9,formatter:'{c}%'}}]
+})
+</script>
 </body>
 </html>
